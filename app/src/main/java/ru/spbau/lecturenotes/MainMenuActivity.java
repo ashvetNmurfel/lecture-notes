@@ -14,11 +14,12 @@ public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //ListView pdfList = findViewById()
+        setContentView(R.layout.activity_main_menu);
         ArrayList<PdfFileStorage> sectionsList = new ArrayList<>();
         sectionsList.add(new PdfFileStorage(false, "Name", "info"));
         PdfListAdapter adapter = new PdfListAdapter(this, sectionsList);
-
-        setContentView(R.layout.activity_main_menu);
+        ListView pdfList = findViewById(R.id.pdf_list);
+        pdfList.setAdapter(adapter);
+        setContentView(R.layout.listview_pdf_item);
     }
 }

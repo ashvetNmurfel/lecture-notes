@@ -13,7 +13,7 @@ import ru.spbau.lecturenotes.data.PdfFileStorage;
 
 public class PdfListAdapter extends ArrayAdapter<PdfListAdapter> {
     public PdfListAdapter(Activity context, ArrayList<PdfFileStorage> pdfs) {
-        super(context, R.layout.listiew_pdf_item);
+        super(context, R.layout.listview_pdf_item);
         this.context = context;
         this.pdfs = pdfs;
     }
@@ -21,7 +21,7 @@ public class PdfListAdapter extends ArrayAdapter<PdfListAdapter> {
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
-        View rowView = inflater.inflate(R.layout.listiew_pdf_item, null, true);
+        View rowView = inflater.inflate(R.layout.listview_pdf_item, null, true);
         TextView nameTextField = rowView.findViewById(R.id.pdf_list_item_name);
         TextView infoTextField = rowView.findViewById(R.id.pdf_list_item_info);
         nameTextField.setText(pdfs.get(position).getName());
