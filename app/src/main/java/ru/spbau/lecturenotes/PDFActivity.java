@@ -21,6 +21,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -64,7 +65,7 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
     private final static int REQUEST_CODE = 42;
     public static final int PERMISSION_CODE = 42042;
 
-    public static final String SAMPLE_FILE = "sample.pdf";
+    public String SAMPLE_FILE = "sample.pdf";
     public static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
 
     @ViewById
@@ -122,6 +123,13 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
 
     private void displayFromAsset(String assetFileName) {
         pdfFileName = assetFileName;
+
+        Bundle extra = getIntent().getExtras();
+        String s = getIntent().getExtras().getString("filename");
+//        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+        if (s != null)
+            SAMPLE_FILE = s;
+
 
         pdfView.fromAsset(SAMPLE_FILE)
                 .defaultPage(pageNumber)

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import ru.spbau.lecturenotes.data.PdfFileStorage;
 
@@ -56,6 +57,12 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
                 } else {
                     intent = new Intent(context, PDFActivity_.class);
                     intent.putExtra("filename", storage.getFile());
+                    Toast.makeText(view.getContext(), storage.getFile(), Toast.LENGTH_LONG).show();
+                    try {
+                        TimeUnit.SECONDS.sleep(3);
+                    } catch (Throwable e) {
+
+                    }
                 }
                 context.startActivity(intent);
             }
