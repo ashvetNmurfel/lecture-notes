@@ -27,7 +27,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -73,6 +77,8 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
     Integer pageNumber = 0;
 
     String pdfFileName;
+
+    private ArrayList<ArrayList<String>> fileComments;
 
     @OptionsItem(R.id.pickFile)
     void pickFile() {
@@ -149,24 +155,24 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
             uri = intent.getData();
             displayFromUri(uri);
         }
-
     }
-
-    private ArrayList<String> comments = new ArrayList<>();
 
     @Override
     public void onPageChanged(int page, int pageCount) {
         pageNumber = page;
         setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
 
-
-        comments.add("первый");
-
+        if (fileComments == null) {
+            fileComments = new ArrayList<>(pdfView.getPageCount());
+            for (int i = 0; i < pdfView.getPageCount(); i++) {
+                fileComments.add(new ArrayList<String>());
+            }
+            return;
+        }
         ListView lv = (ListView) findViewById(R.id.commentsList);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, comments);
+                android.R.layout.simple_list_item_1, fileComments.get(pageNumber));
         lv.setAdapter(adapter);
-
     }
 
     public String getFileName(Uri uri) {
@@ -237,5 +243,11 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
     @Override
     public void onPageError(int page, Throwable t) {
         Log.e(TAG, "Cannot load page " + page);
+    }
+
+    public void onClickButton(View view) {
+        EditText et = (EditText) PDFActivity.this.findViewById(R.id.yourComment);
+        fileComments.get(pageNumber).add(et.getText().toString());
+        et.getText().clear();
     }
 }
