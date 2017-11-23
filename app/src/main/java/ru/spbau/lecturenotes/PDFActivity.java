@@ -27,6 +27,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
@@ -45,6 +47,7 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @EActivity(R.layout.activity_pdf)
@@ -146,12 +149,24 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
             uri = intent.getData();
             displayFromUri(uri);
         }
+
     }
+
+    private ArrayList<String> comments = new ArrayList<>();
 
     @Override
     public void onPageChanged(int page, int pageCount) {
         pageNumber = page;
         setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
+
+
+        comments.add("первый");
+
+        ListView lv = (ListView) findViewById(R.id.commentsList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, comments);
+        lv.setAdapter(adapter);
+
     }
 
     public String getFileName(Uri uri) {
