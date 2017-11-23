@@ -34,7 +34,7 @@ public class MainMenuController {
         storage.put(javaDir.getName(), javaDir);
         PdfFileStorage algebraDir = PdfFileStorage.createDirectory("Algebra", "lecture notes & chep", algebraList);
         storage.put(algebraDir.getName(), algebraDir);
-        PdfFileStorage history = PdfFileStorage.createFile("History", "Story of the world", "history.pdf");
+        PdfFileStorage history = PdfFileStorage.createFile("History", "Story of the world", "sample.pdf");
         storage.put(history.getName(), history);
 
 
