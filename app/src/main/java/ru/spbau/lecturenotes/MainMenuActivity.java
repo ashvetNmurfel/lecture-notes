@@ -28,7 +28,6 @@ public class MainMenuActivity extends AppCompatActivity {
         PdfListAdapter adapter = new PdfListAdapter(this, sectionsList);
         ListView pdfList = (ListView) findViewById(R.id.pdf_list);
         pdfList.setAdapter(adapter);
-        Toast.makeText(getApplicationContext(), "loaded", Toast.LENGTH_LONG).show();
 
 //        ArrayList<PdfFileStorage> sectionsList = new ArrayList<>();
 //        sectionsList.add(new PdfFileStorage(false, "Name", "info"));
