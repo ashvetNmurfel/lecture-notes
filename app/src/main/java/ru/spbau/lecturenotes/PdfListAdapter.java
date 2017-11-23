@@ -37,7 +37,7 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
     }
 
     @Override
-    public View getView(int position, View view, final ViewGroup parent) {
+    public View getView(final int position, View view, final ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.listview_pdf_item, null);
         TextView nameTextField = (TextView) rowView.findViewById(R.id.pdf_list_item_name);
@@ -48,8 +48,16 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "string toast", Toast.LENGTH_LONG).show();
-                context.startActivity(new Intent(context, PDFActivity_.class));
+                Intent intent;
+                PdfFileStorage storage = pdfs.get(position);
+                if (storage.isDirectory()) {
+                    intent = new Intent(context, MainMenuActivity.class);
+                    intent.putExtra("nodeId", storage.getName());
+                } else {
+                    intent = new Intent(context, PDFActivity_.class);
+                    intent.putExtra("filename", storage.getFile());
+                }
+                context.startActivity(intent);
             }
         });
         return rowView;

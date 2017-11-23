@@ -12,6 +12,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.spbau.lecturenotes.controllers.MainController;
 import ru.spbau.lecturenotes.data.PdfFileStorage;
 
 
@@ -22,7 +23,15 @@ public class MainMenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
         ArrayList<PdfFileStorage> sectionsList = new ArrayList<>();
-        sectionsList.add(PdfFileStorage.createFile("Name", "info", null));
+
+        Bundle extras =  getIntent().getExtras();
+        if (extras == null || extras.getString("nodeId") == null) {
+            sectionsList = MainController.INSTANCE.getRootDirectory().substorages();
+            sectionsList.add(PdfFileStorage.createFile("root", "info", null));
+        } else {
+            sectionsList = MainController.INSTANCE.getDir(extras.getString("nodeId")).substorages();
+            sectionsList.add(PdfFileStorage.createFile("new data", "info", null));
+        }
         PdfListAdapter adapter = new PdfListAdapter(this, sectionsList);
         ListView pdfList = (ListView) findViewById(R.id.pdf_list);
         pdfList.setAdapter(adapter);
