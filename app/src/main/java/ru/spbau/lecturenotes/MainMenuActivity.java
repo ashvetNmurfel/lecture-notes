@@ -2,8 +2,11 @@ package ru.spbau.lecturenotes;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -16,10 +19,10 @@ public class MainMenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
         ArrayList<PdfFileStorage> sectionsList = new ArrayList<>();
-        sectionsList.add(new PdfFileStorage(false, "Name", "info"));
+        sectionsList.add(PdfFileStorage.createFile("Name", "info", null));
         PdfListAdapter adapter = new PdfListAdapter(this, sectionsList);
         ListView pdfList = findViewById(R.id.pdf_list);
         pdfList.setAdapter(adapter);
-        setContentView(R.layout.listview_pdf_item);
+        Toast.makeText(getApplicationContext(), "loaded", Toast.LENGTH_LONG).show();
     }
 }
