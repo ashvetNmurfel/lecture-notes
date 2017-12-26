@@ -265,20 +265,6 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
     public void onClickButton(View view) {
         EditText et = (EditText) PDFActivity.this.findViewById(R.id.yourComment);
         fileComments.get(pageNumber).add(et.getText().toString());
-        if (SAMPLE_FILE.equals("algos_conspect.pdf")) {
-            String s = null;
-            if (cnt == 1)
-                s = "SK: А мы здесь применили математическую интуицию.";
-            if (cnt == 3)
-                s = "SK: Это же и так понятно";
-            if (cnt == 6)
-                s = "SK: TODO. TODO. TODO TODO TODO. TODO TODOOOOO. DO DODODO DO.";
-            if (s != null)
-                fileComments.get(pageNumber).add(s);
-            cnt++;
-        }
         et.getText().clear();
     }
-
-    private int cnt;
 }
