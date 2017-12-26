@@ -1,5 +1,7 @@
 package ru.spbau.lecturenotes;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ListView;
@@ -13,6 +15,14 @@ import ru.spbau.lecturenotes.data.PdfFileStorage;
 
 public class MainMenuActivity extends AppCompatActivity {
 
+    public static final String KEY_NODE_ID = "nodeId";
+
+    public static Intent createIntentForNode(Context context, String nodeId) {
+        Intent intent = new Intent(context, MainMenuActivity.class);
+        intent.putExtra(MainMenuActivity.KEY_NODE_ID, nodeId);
+        return intent;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,10 +30,10 @@ public class MainMenuActivity extends AppCompatActivity {
         ArrayList<PdfFileStorage> sectionsList = new ArrayList<>();
 
         Bundle extras =  getIntent().getExtras();
-        if (extras == null || extras.getString("nodeId") == null) {
+        if (extras == null || extras.getString(KEY_NODE_ID) == null) {
             sectionsList = MainMenuController.INSTANCE.getRootDirectory().substorages();
         } else {
-            sectionsList = MainMenuController.INSTANCE.getDir(extras.getString("nodeId")).substorages();
+            sectionsList = MainMenuController.INSTANCE.getDir(extras.getString(KEY_NODE_ID)).substorages();
         }
         PdfListAdapter adapter = new PdfListAdapter(this, sectionsList);
         ListView pdfList = (ListView) findViewById(R.id.pdf_list);

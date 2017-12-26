@@ -1,6 +1,7 @@
 package ru.spbau.lecturenotes;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,34 +40,46 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
 
     @Override
     public View getView(final int position, View view, final ViewGroup parent) {
-        LayoutInflater inflater = context.getLayoutInflater();
-        View rowView = inflater.inflate(R.layout.listview_pdf_item, null);
-        TextView nameTextField = (TextView) rowView.findViewById(R.id.pdf_list_item_name);
-        TextView infoTextField = (TextView) rowView.findViewById(R.id.pdf_list_item_info);
-        nameTextField.setText(pdfs.get(position).getName());
-        infoTextField.setText(pdfs.get(position).getInfo());
+        Holder holder;
+        if (view == null) {
+            LayoutInflater inflater = context.getLayoutInflater();
+            view = inflater.inflate(R.layout.listview_pdf_item, null);
+            holder = new Holder();
+            holder.nameTextField = (TextView) view.findViewById(R.id.pdf_list_item_name);
+            holder.infoTextField = (TextView) view.findViewById(R.id.pdf_list_item_info);
+            view.setOnClickListener(holder);
+            view.setTag(holder);
+        } else {
+            holder = (Holder)view.getTag();
+        }
 
-        rowView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent;
-                PdfFileStorage storage = pdfs.get(position);
-                if (storage.isDirectory()) {
-                    intent = new Intent(context, MainMenuActivity.class);
-                    intent.putExtra("nodeId", storage.getName());
-                } else {
-                    intent = new Intent(context, PDFActivity_.class);
-                    intent.putExtra("filename", storage.getFile());
-                    Toast.makeText(view.getContext(), storage.getFile(), Toast.LENGTH_LONG).show();
-                    try {
-                        TimeUnit.SECONDS.sleep(3);
-                    } catch (Throwable e) {
+        holder.storage = pdfs.get(position);
+        holder.nameTextField.setText(holder.storage.getName());
+        holder.infoTextField.setText(holder.storage.getInfo());
 
-                    }
-                }
-                context.startActivity(intent);
-            }
-        });
-        return rowView;
+        return view;
+    }
+
+    private void onItemClicked(Context context, PdfFileStorage storage) {
+        Intent intent;
+        if (storage.isDirectory()) {
+            intent = MainMenuActivity.createIntentForNode(this.context, storage.getName());
+        } else {
+            intent = PDFActivity.createIntentForFile(this.context, storage.getFile());
+            Toast.makeText(context, storage.getFile(), Toast.LENGTH_LONG).show();
+        }
+        this.context.startActivity(intent);
+    }
+
+
+    private class Holder implements View.OnClickListener {
+        private TextView nameTextField;
+        private TextView infoTextField;
+        private PdfFileStorage storage;
+
+        @Override
+        public void onClick(View view) {
+            PdfListAdapter.this.onItemClicked(view.getContext(), storage);
+        }
     }
 }

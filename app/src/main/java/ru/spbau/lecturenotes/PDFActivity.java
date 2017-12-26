@@ -16,6 +16,7 @@
 package ru.spbau.lecturenotes;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -62,9 +63,11 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
 
     private static final String TAG = PDFActivity.class.getSimpleName();
 
-    private final static int REQUEST_CODE = 42;
     public static final int PERMISSION_CODE = 42042;
+    private static final String KEY_FILENAME = "filename";
 
+    private final static int REQUEST_CODE = 42;
+    public static final String MIME_TYPE_PDF = "application/pdf";
     public String SAMPLE_FILE = "sample.pdf";
     public static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
 
@@ -80,6 +83,12 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
     String pdfFileName;
 
     private ArrayList<ArrayList<String>> fileComments;
+
+    public static Intent createIntentForFile(Context context, String filename) {
+        Intent intent = new Intent(context, PDFActivity_.class);
+        intent.putExtra(PDFActivity.KEY_FILENAME, filename);
+        return intent;
+    }
 
     @OptionsItem(R.id.pickFile)
     void pickFile() {
@@ -101,7 +110,7 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
 
     void launchPicker() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("application/pdf");
+        intent.setType(MIME_TYPE_PDF);
         try {
             startActivityForResult(intent, REQUEST_CODE);
         } catch (ActivityNotFoundException e) {
@@ -125,7 +134,7 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
         pdfFileName = assetFileName;
 
         Bundle extra = getIntent().getExtras();
-        String s = getIntent().getExtras().getString("filename");
+        String s = getIntent().getExtras().getString(KEY_FILENAME);
 //        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
         if (s != null)
             SAMPLE_FILE = s;
