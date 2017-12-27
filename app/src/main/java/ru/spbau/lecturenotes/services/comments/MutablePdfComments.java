@@ -22,9 +22,15 @@ class MutablePdfComments extends PdfComment{
         );
     }
 
-
-     MutablePdfComments addReply(PdfComment newReply) {
+    @NotNull
+    MutablePdfComments addReply(@NotNull PdfComment newReply) {
         replies.add(newReply);
+        return this;
+    }
+
+    @NotNull
+    MutablePdfComments addAttachment(@NotNull CommentAttachment newAttachment) {
+        attachments.add(newAttachment)
         return this;
     }
 }

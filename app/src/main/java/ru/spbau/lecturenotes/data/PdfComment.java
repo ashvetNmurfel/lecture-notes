@@ -15,8 +15,8 @@ public class PdfComment {
     protected final ArrayList<PdfComment> replies;
     protected final String author;
     protected final String content;
-    Timestamp timestamp;
-    ArrayList<CommentAttachment> attachments;
+    protected Timestamp timestamp;
+    protected ArrayList<CommentAttachment> attachments;
 
     protected PdfComment(@NotNull final String author,
                          @NotNull final String content,
