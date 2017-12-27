@@ -71,6 +71,8 @@ import ru.spbau.lecturenotes.data.PdfComment;
 import ru.spbau.lecturenotes.data.attachments.PictureAttachment;
 import ru.spbau.lecturenotes.services.comments.CommentBuilder;
 
+import ru.spbau.lecturenotes.data.PdfComment;
+
 @EActivity(R.layout.activity_pdf)
 @OptionsMenu(R.menu.options)
 public class PDFActivity extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener,
