@@ -3,17 +3,15 @@ package ru.spbau.lecturenotes.data.attachments;
 import android.graphics.drawable.Drawable;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class PictureAttachment extends CommentAttachment {
     private String path = null;
     private Drawable drawable = null;
 
-    public PictureAttachment(@Nullable final String picturePath,
-                             @Nullable final Drawable pictureDrawable,
+    public PictureAttachment(@NotNull final String picturePath,
+                             @NotNull final Drawable pictureDrawable,
                              @NotNull final String author) {
         super(author);
-        assert pictureDrawable != null || picturePath != null;
         //todo: download image and upload it to firebase.
         // Then delegate work with a file to the firebase.
         drawable = pictureDrawable;
@@ -22,12 +20,14 @@ public class PictureAttachment extends CommentAttachment {
 
     public PictureAttachment(@NotNull final String picturePath,
                              @NotNull final String author) {
-        this(picturePath, null, author);
+        super(author);
+        path = picturePath;
     }
 
     public PictureAttachment(@NotNull final Drawable pictureDrawable,
                              @NotNull final String author) {
-        this(null, pictureDrawable, author);
+        super(author);
+        drawable = pictureDrawable;
     }
 
     public String getPicturePath() {
