@@ -32,8 +32,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -135,7 +133,6 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
 
         Bundle extra = getIntent().getExtras();
         String s = getIntent().getExtras().getString(KEY_FILENAME);
-//        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
         if (s != null)
             SAMPLE_FILE = s;
 
@@ -172,12 +169,6 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
             uri = intent.getData();
             displayFromUri(uri);
         }
-    }
-
-    @Override
-    public void onPageChanged(int page, int pageCount) {
-        pageNumber = page;
-        setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
 
         if (fileComments == null) {
             fileComments = new ArrayList<>(pdfView.getPageCount());
@@ -186,6 +177,18 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
             }
             return;
         }
+        ListView lv = (ListView) findViewById(R.id.commentsList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, fileComments.get(pageNumber));
+        lv.setAdapter(adapter);
+
+    }
+
+    @Override
+    public void onPageChanged(int page, int pageCount) {
+        pageNumber = page;
+        setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
+
         ListView lv = (ListView) findViewById(R.id.commentsList);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, fileComments.get(pageNumber));
@@ -226,6 +229,10 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
 
         printBookmarksTree(pdfView.getTableOfContents(), "-");
 
+        fileComments = new ArrayList<>(pdfView.getPageCount());
+        for (int i = 0; i < pdfView.getPageCount(); i++) {
+            fileComments.add(new ArrayList<String>());
+        }
     }
 
     public void printBookmarksTree(List<PdfDocument.Bookmark> tree, String sep) {
