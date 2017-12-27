@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1047742897537",
+    "firebase_url": "https://lecture-notes-6a30f.firebaseio.com",
+    "project_id": "lecture-notes-6a30f",
+    "storage_bucket": "lecture-notes-6a30f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1047742897537:android:8c24859a22661011",
+        "android_client_info": {
+          "package_name": "ru.spbau.lecturenotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1047742897537-d4kr9labk4hel1m112c1ua8vvou30vje.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.spbau.lecturenotes",
+            "certificate_hash": "5639cd239674c95baef804dc90c181fe35d9a8db"
+          }
+        },
+        {
+          "client_id": "1047742897537-4hfoscj512cao2s4djkah25nq7o6974n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgycrvQlBU_LQ4FzCCbE-Mkv7yvZ_aEnc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1047742897537-4hfoscj512cao2s4djkah25nq7o6974n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
