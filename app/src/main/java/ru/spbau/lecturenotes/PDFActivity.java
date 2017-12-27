@@ -20,9 +20,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -54,6 +58,8 @@ import org.androidannotations.annotations.ViewById;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.spbau.lecturenotes.data.PdfComment;
+
 @EActivity(R.layout.activity_pdf)
 @OptionsMenu(R.menu.options)
 public class PDFActivity extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener,
@@ -80,7 +86,7 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
 
     String pdfFileName;
 
-    private ArrayList<ArrayList<String>> fileComments;
+    private ArrayList<ArrayList<PdfComment>> fileComments;
 
     public static Intent createIntentForFile(Context context, String filename) {
         Intent intent = new Intent(context, PDFActivity_.class);
@@ -170,18 +176,16 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
             displayFromUri(uri);
         }
 
-        if (fileComments == null) {
-            fileComments = new ArrayList<>(pdfView.getPageCount());
-            for (int i = 0; i < pdfView.getPageCount(); i++) {
-                fileComments.add(new ArrayList<String>());
-            }
-            return;
-        }
-        ListView lv = (ListView) findViewById(R.id.commentsList);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, fileComments.get(pageNumber));
-        lv.setAdapter(adapter);
-
+//        if (fileComments == null) {
+//            fileComments = new ArrayList<>(pdfView.getPageCount());
+//            for (int i = 0; i < pdfView.getPageCount(); i++) {
+//                fileComments.add(new ArrayList<String>());
+//            }
+//            return;
+//        }
+//        ListView lv = (ListView) findViewById(R.id.commentsList);
+//        PdfCommentAdapter adapter = new PdfCommentAdapter(this, fileComments.get(pageNumber));
+//        lv.setAdapter(adapter);
     }
 
     @Override
@@ -190,8 +194,7 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
         setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
 
         ListView lv = (ListView) findViewById(R.id.commentsList);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, fileComments.get(pageNumber));
+        PdfCommentAdapter adapter = new PdfCommentAdapter(this, fileComments.get(page));
         lv.setAdapter(adapter);
     }
 
@@ -231,7 +234,7 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
 
         fileComments = new ArrayList<>(pdfView.getPageCount());
         for (int i = 0; i < pdfView.getPageCount(); i++) {
-            fileComments.add(new ArrayList<String>());
+            fileComments.add(new ArrayList<PdfComment>());
         }
     }
 
@@ -271,7 +274,28 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
 
     public void onClickButton(View view) {
         EditText et = (EditText) PDFActivity.this.findViewById(R.id.yourComment);
-        fileComments.get(pageNumber).add(et.getText().toString());
+//        fileComments.get(pageNumber).add(et.getText().toString()); TODO
         et.getText().clear();
+
+//        dispatchTakePictureIntent();
     }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            Drawable d = new BitmapDrawable(getResources(), imageBitmap);
+//            fileComments.get(pageNumber).get(fileComments.size() - 1);
+        }
+    }
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 }
