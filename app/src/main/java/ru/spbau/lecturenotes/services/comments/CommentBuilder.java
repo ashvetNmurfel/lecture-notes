@@ -15,6 +15,7 @@ public class CommentBuilder {
 
     public boolean add(@NotNull CommentAttachment attachment) {
         instance.addAttachment(attachment);
+        return true;
     }
 
     @NotNull
