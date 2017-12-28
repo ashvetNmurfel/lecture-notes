@@ -1,12 +1,16 @@
 package ru.spbau.lecturenotes;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -50,9 +54,41 @@ public class PdfCommentAdapter extends BaseAdapter {
         PdfComment comment = commentList.get(i);
         TextView textView = (TextView) view.findViewById(R.id.pdfComment);
         textView.setText(comment.getContent());
-//        Drawable drawable = ((PictureAttachment) comment.getAttachments().get(0)).getDrawable();
-//        textView.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-
+        if (comment.getAttachments().size() > 0) {
+            setPic(((PictureAttachment) comment.getAttachments().get(0)).getPicturePath(), textView);
+        }
         return view;
     }
+
+    private void setPic(String mCurrentPhotoPath, View textView) {
+        ImageView mImageView = (ImageView) textView.findViewById(R.id.myImage);
+
+        if (mImageView == null) {
+            Toast.makeText(context, "problememes: mImageView == null", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Get the dimensions of the View
+        int targetW = 50;
+        int targetH = 50;
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        // Determine how much to scale down the image
+        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        mImageView.setImageBitmap(bitmap);
+    }
+
 }

@@ -278,34 +278,20 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
 
     public void onClickButton(View view) {
         EditText et = (EditText) PDFActivity.this.findViewById(R.id.yourComment);
-        CommentBuilder commentBuilder = new CommentBuilder("anon", et.getText().toString());
+        String content = et.getText().toString();
+        if (commentBuilder == null) {
+            commentBuilder = new CommentBuilder("anon", content);
+        } else {
+            commentBuilder.addContent(content);
+        }
         et.getText().clear();
         fileComments.get(pageNumber).add(commentBuilder.toPdfComment());
+        commentBuilder = null;
     }
 
     public void onClickButtonAddPhoto(View view) {
         dispatchTakePictureIntent();
     }
-
-//    private void dispatchTakePictureIntent() {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//        }
-//    }
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//            ImageView imageView = (ImageView) findViewById(R.id.myImage);
-//            imageView.setImageBitmap(imageBitmap);
-//            Drawable drawable = new BitmapDrawable(getResources(), imageBitmap);
-//            commentBuilder.add(new PictureAttachment(drawable, "anon"));
-//        }
-//    }
-
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -333,12 +319,12 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             setPic();
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//            ImageView imageView = (ImageView) findViewById(R.id.myImage);
-//            imageView.setImageBitmap(imageBitmap);
-//            Drawable drawable = new BitmapDrawable(getResources(), imageBitmap);
-//            commentBuilder.add(new PictureAttachment(drawable, "anon"));
+            if (commentBuilder == null) {
+                commentBuilder = new CommentBuilder("anon", "", new PictureAttachment(mCurrentPhotoPath, "anon"));
+            } else {
+                commentBuilder.add(new PictureAttachment(mCurrentPhotoPath, "anon"));
+            }
+            Toast.makeText(this, "onActivityResult", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -346,8 +332,8 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
         ImageView mImageView = (ImageView) findViewById(R.id.myImage);
 
         // Get the dimensions of the View
-        int targetW = mImageView.getWidth();
-        int targetH = mImageView.getHeight();
+        int targetW = 100;
+        int targetH = 100;
 
         // Get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
