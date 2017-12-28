@@ -1,16 +1,19 @@
 package ru.spbau.lecturenotes;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
 import ru.spbau.lecturenotes.data.PdfComment;
+import ru.spbau.lecturenotes.data.attachments.PictureAttachment;
 
 public class PdfCommentAdapter extends BaseAdapter {
     private Context context;
@@ -45,9 +48,11 @@ public class PdfCommentAdapter extends BaseAdapter {
             view = layoutInflater.inflate(R.layout.listview_comment_item, viewGroup, false);
         }
         PdfComment comment = commentList.get(i);
-        ((TextView) view.findViewById(R.id.pdfComment)).setText(comment.getContent());
-        ((TextView) view.findViewById(R.id.pdfComment)).setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_launcher, 0, 0, 0);
+        TextView textView = (TextView) view.findViewById(R.id.pdfComment);
+        textView.setText(comment.getContent());
+//        Drawable drawable = ((PictureAttachment) comment.getAttachments().get(0)).getDrawable();
+//        textView.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
 
-        return null;
+        return view;
     }
 }
