@@ -72,6 +72,8 @@ import ru.spbau.lecturenotes.data.attachments.PictureAttachment;
 import ru.spbau.lecturenotes.services.comments.CommentBuilder;
 
 import ru.spbau.lecturenotes.data.PdfComment;
+import ru.spbau.lecturenotes.data.attachments.PictureAttachment;
+import ru.spbau.lecturenotes.services.comments.CommentBuilder;
 
 @EActivity(R.layout.activity_pdf)
 @OptionsMenu(R.menu.options)
