@@ -354,8 +354,6 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
         mImageView.setImageBitmap(bitmap);
     }
 
-
-
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -371,9 +369,7 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
-
-
-
+    
     private String mCurrentPhotoPath;
     private CommentBuilder commentBuilder;
     static final int REQUEST_IMAGE_CAPTURE = 1;

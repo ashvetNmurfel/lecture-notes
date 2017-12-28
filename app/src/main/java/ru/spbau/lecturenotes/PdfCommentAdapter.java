@@ -55,13 +55,13 @@ public class PdfCommentAdapter extends BaseAdapter {
         TextView textView = (TextView) view.findViewById(R.id.pdfComment);
         textView.setText(comment.getContent());
         if (comment.getAttachments().size() > 0) {
-            setPic(((PictureAttachment) comment.getAttachments().get(0)).getPicturePath(), textView);
+            setPic(((PictureAttachment) comment.getAttachments().get(0)).getPicturePath(), view);
         }
         return view;
     }
 
-    private void setPic(String mCurrentPhotoPath, View textView) {
-        ImageView mImageView = (ImageView) textView.findViewById(R.id.myImage);
+    private void setPic(String mCurrentPhotoPath, View view) {
+        ImageView mImageView = (ImageView) view.findViewById(R.id.myImage);
 
         if (mImageView == null) {
             Toast.makeText(context, "problememes: mImageView == null", Toast.LENGTH_SHORT).show();
@@ -69,8 +69,8 @@ public class PdfCommentAdapter extends BaseAdapter {
         }
 
         // Get the dimensions of the View
-        int targetW = 50;
-        int targetH = 50;
+        int targetW = 100;
+        int targetH = 100;
 
         // Get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
