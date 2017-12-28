@@ -29,6 +29,11 @@ public class CommentBuilder {
         return true;
     }
 
+    public boolean addContent(@NotNull String content) {
+        instance.addContent(content);
+        return true;
+    }
+
     @NotNull
     public PdfComment toPdfComment() {
         return instance;

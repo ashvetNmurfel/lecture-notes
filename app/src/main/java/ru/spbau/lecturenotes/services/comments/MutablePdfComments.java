@@ -29,6 +29,12 @@ class MutablePdfComments extends PdfComment{
     }
 
     @NotNull
+    MutablePdfComments addContent(@NotNull String content) {
+        this.content += content;
+        return this;
+    }
+
+    @NotNull
     MutablePdfComments addAttachment(@NotNull CommentAttachment newAttachment) {
         attachments.add(newAttachment);
         return this;

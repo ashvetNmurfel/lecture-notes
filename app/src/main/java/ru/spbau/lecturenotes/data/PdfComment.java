@@ -14,7 +14,7 @@ public class PdfComment {
     protected final boolean isEdited = false;
     protected final ArrayList<PdfComment> replies;
     protected final String author;
-    protected final String content;
+    protected String content;
     protected Timestamp timestamp;
     protected ArrayList<CommentAttachment> attachments;
 
