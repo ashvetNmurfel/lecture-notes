@@ -21,21 +21,25 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -55,10 +59,17 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import ru.spbau.lecturenotes.data.PdfComment;
+import ru.spbau.lecturenotes.data.attachments.PictureAttachment;
+import ru.spbau.lecturenotes.services.comments.CommentBuilder;
 
 @EActivity(R.layout.activity_pdf)
 @OptionsMenu(R.menu.options)
@@ -175,23 +186,12 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
             uri = intent.getData();
             displayFromUri(uri);
         }
-
-//        if (fileComments == null) {
-//            fileComments = new ArrayList<>(pdfView.getPageCount());
-//            for (int i = 0; i < pdfView.getPageCount(); i++) {
-//                fileComments.add(new ArrayList<String>());
-//            }
-//            return;
-//        }
-//        ListView lv = (ListView) findViewById(R.id.commentsList);
-//        PdfCommentAdapter adapter = new PdfCommentAdapter(this, fileComments.get(pageNumber));
-//        lv.setAdapter(adapter);
     }
 
     @Override
     public void onPageChanged(int page, int pageCount) {
         pageNumber = page;
-        setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
+        setTitle(String.format(Locale.ENGLISH, "%s %d / %s", pdfFileName, page + 1, pageCount));
 
         ListView lv = (ListView) findViewById(R.id.commentsList);
         PdfCommentAdapter adapter = new PdfCommentAdapter(this, fileComments.get(page));
@@ -274,28 +274,118 @@ public class PDFActivity extends AppCompatActivity implements OnPageChangeListen
 
     public void onClickButton(View view) {
         EditText et = (EditText) PDFActivity.this.findViewById(R.id.yourComment);
-//        fileComments.get(pageNumber).add(et.getText().toString()); TODO
+        CommentBuilder commentBuilder = new CommentBuilder("anon", et.getText().toString());
         et.getText().clear();
-
-//        dispatchTakePictureIntent();
+        fileComments.get(pageNumber).add(commentBuilder.toPdfComment());
     }
+
+    public void onClickButtonAddPhoto(View view) {
+        dispatchTakePictureIntent();
+    }
+
+//    private void dispatchTakePictureIntent() {
+//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+//            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//        }
+//    }
+//
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+//            Bundle extras = data.getExtras();
+//            Bitmap imageBitmap = (Bitmap) extras.get("data");
+//            ImageView imageView = (ImageView) findViewById(R.id.myImage);
+//            imageView.setImageBitmap(imageBitmap);
+//            Drawable drawable = new BitmapDrawable(getResources(), imageBitmap);
+//            commentBuilder.add(new PictureAttachment(drawable, "anon"));
+//        }
+//    }
+
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            Drawable d = new BitmapDrawable(getResources(), imageBitmap);
-//            fileComments.get(pageNumber).get(fileComments.size() - 1);
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            setPic();
+//            Bundle extras = data.getExtras();
+//            Bitmap imageBitmap = (Bitmap) extras.get("data");
+//            ImageView imageView = (ImageView) findViewById(R.id.myImage);
+//            imageView.setImageBitmap(imageBitmap);
+//            Drawable drawable = new BitmapDrawable(getResources(), imageBitmap);
+//            commentBuilder.add(new PictureAttachment(drawable, "anon"));
         }
     }
 
+    private void setPic() {
+        ImageView mImageView = (ImageView) findViewById(R.id.myImage);
+
+        // Get the dimensions of the View
+        int targetW = mImageView.getWidth();
+        int targetH = mImageView.getHeight();
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        // Determine how much to scale down the image
+        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        mImageView.setImageBitmap(bitmap);
+    }
+
+
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+
+
+    private String mCurrentPhotoPath;
+    private CommentBuilder commentBuilder;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_TAKE_PHOTO = 1;
 }
