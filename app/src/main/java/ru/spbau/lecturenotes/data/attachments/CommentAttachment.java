@@ -10,4 +10,12 @@ public class CommentAttachment {
         this.author = author;
         attachmentId = "";
     }
+
+    public String getAttachmentId() {
+        return attachmentId;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
 }

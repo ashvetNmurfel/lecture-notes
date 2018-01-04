@@ -51,6 +51,11 @@ public class PdfComment {
     }
 
     @NotNull
+    public String getId() {
+        return commentId;
+    }
+
+    @NotNull
     public List<PdfComment> getThread() {
         return replies;
     }
