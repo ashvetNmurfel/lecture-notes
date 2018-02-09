@@ -8,6 +8,11 @@ public class DiscussionId {
     protected DiscussionLocation location;
 
     @NotNull
+    public GroupId getGroupId() {
+        return document.getGroupId();
+    }
+
+    @NotNull
     public DocumentId getDocumentId() {
         return document;
     }

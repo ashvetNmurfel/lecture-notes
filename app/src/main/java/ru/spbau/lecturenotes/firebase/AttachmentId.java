@@ -1,5 +1,7 @@
 package ru.spbau.lecturenotes.firebase;
 
+import org.jetbrains.annotations.NotNull;
+
 public class AttachmentId {
     protected CommentId commentId;
     protected String key;
@@ -7,10 +9,27 @@ public class AttachmentId {
     public AttachmentId() {
     }
 
+    @NotNull
     public CommentId getCommentId() {
         return commentId;
     }
 
+    @NotNull
+    public DiscussionId getDiscussion() {
+        return commentId.getDiscussion();
+    }
+
+    @NotNull
+    public GroupId getGroupId() {
+        return commentId.getGroupId();
+    }
+
+    @NotNull
+    public DocumentId getDocumentId() {
+        return commentId.getDocumentId();
+    }
+
+    @NotNull
     public String getKey() {
         return key;
     }
