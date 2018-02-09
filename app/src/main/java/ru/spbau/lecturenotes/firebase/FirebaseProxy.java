@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.Date;
 import java.util.EventListener;
+import java.util.List;
 
 public class FirebaseProxy implements DatabaseInterface {
     static FirebaseProxy INSTANCE = new FirebaseProxy();
@@ -28,7 +29,17 @@ public class FirebaseProxy implements DatabaseInterface {
     }
 
     @Override
-    public DiscussionId createDiscussion(NewDiscussionRequest request) {
+    public List<Document> getDocumentsList(GroupId group) {
+        return null;
+    }
+
+    @Override
+    public List<Group> getGroupList() {
+        return null;
+    }
+
+    @Override
+    public DiscussionId addDiscussion(NewDiscussionRequest request) {
         return null;
     }
 
@@ -38,7 +49,12 @@ public class FirebaseProxy implements DatabaseInterface {
     }
 
     @Override
-    public ListenerRegistration setDocumentListListener(EventListener listener) {
+    public ListenerRegistration setDocumentListListener(EventListener listener, GroupId group) {
+        return null;
+    }
+
+    @Override
+    public ListenerRegistration setGroupsListListener(EventListener listener) {
         return null;
     }
 
@@ -226,7 +242,4 @@ public class FirebaseProxy implements DatabaseInterface {
             return updateTimestamp;
         }
     }
-
-
-
 }

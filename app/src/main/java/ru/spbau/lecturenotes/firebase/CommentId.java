@@ -1,6 +1,6 @@
 package ru.spbau.lecturenotes.firebase;
 
-class CommentId {
+public class CommentId {
     protected DiscussionId discussion;
     protected String key;
 

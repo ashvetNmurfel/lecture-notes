@@ -1,6 +1,6 @@
 package ru.spbau.lecturenotes.firebase;
 
-class NewDiscussionRequest {
+public class NewDiscussionRequest {
     protected DocumentId documentId;
     protected DiscussionLocation location;
     protected Comment comment;

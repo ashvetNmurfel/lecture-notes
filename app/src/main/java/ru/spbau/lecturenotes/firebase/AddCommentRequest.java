@@ -2,7 +2,7 @@ package ru.spbau.lecturenotes.firebase;
 
 import org.jetbrains.annotations.NotNull;
 
-class AddCommentRequest {
+public class AddCommentRequest {
     protected DiscussionId discussionId;
     protected Comment comment;
 

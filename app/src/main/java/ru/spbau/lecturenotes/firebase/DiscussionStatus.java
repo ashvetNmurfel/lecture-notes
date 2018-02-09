@@ -1,6 +1,6 @@
 package ru.spbau.lecturenotes.firebase;
 
-enum DiscussionStatus {
+public enum DiscussionStatus {
     UNKNOWN,
 
     FIX_REQUESTED,

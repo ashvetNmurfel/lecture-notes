@@ -2,7 +2,7 @@ package ru.spbau.lecturenotes.firebase;
 
 import android.graphics.Point;
 
-class Rectangle {
+public class Rectangle {
     protected Point leftUpperCorner;
     protected Point rightLowerCorner;
     protected Point rightUpperCorner;

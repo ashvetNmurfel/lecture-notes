@@ -3,7 +3,7 @@ package ru.spbau.lecturenotes.firebase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class DiscussionLocation {
+public class DiscussionLocation {
     protected DocumentId documentId;
     protected int page;
     protected Rectangle rectangle;

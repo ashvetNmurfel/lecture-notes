@@ -1,6 +1,6 @@
 package ru.spbau.lecturenotes.firebase;
 
-enum AttachmentType {
+public enum AttachmentType {
     PICTURE,
     LINK
 }

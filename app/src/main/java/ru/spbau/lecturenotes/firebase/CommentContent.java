@@ -1,6 +1,6 @@
 package ru.spbau.lecturenotes.firebase;
 
-class CommentContent {
+public class CommentContent {
     protected String text;
     protected AttachmentId[] attachmentsIds;
 

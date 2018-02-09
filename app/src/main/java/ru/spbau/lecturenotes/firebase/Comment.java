@@ -4,12 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Date;
+import java.util.List;
 
 
 /**
  * Structure that will be returned to UI layer as a result of the comment request.
  */
-class Comment {
+public class Comment {
     protected CommentId id;
     protected CommentId parentId;
     protected CommentContent content;
@@ -17,6 +18,7 @@ class Comment {
     protected Date creationTimestamp;
     protected boolean isEdited;
     protected Date editTimestamp;
+
 
     @NotNull
     public CommentId getId() {

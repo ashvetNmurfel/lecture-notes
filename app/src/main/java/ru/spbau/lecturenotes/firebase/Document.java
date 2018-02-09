@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Structure that will be returned to UI layer as a result of the document request.
  */
-class Document {
+public class Document {
     protected DocumentId id;
     protected String filename;
     protected List<DiscussionId> discussions;

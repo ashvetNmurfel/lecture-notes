@@ -2,7 +2,7 @@ package ru.spbau.lecturenotes.firebase;
 
 import org.jetbrains.annotations.NotNull;
 
-class DiscussionId {
+public class DiscussionId {
     protected DocumentId document;
     protected String key;
 

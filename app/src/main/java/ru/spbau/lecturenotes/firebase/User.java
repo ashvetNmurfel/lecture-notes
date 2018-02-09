@@ -1,6 +1,6 @@
 package ru.spbau.lecturenotes.firebase;
 
-class User {
+public class User {
     protected String username;
 
     public String getUsername() {
