@@ -4,21 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class DiscussionLocation {
-    protected DocumentId documentId;
     protected int page;
     protected Rectangle rectangle;
 
-    public DiscussionLocation(@NotNull final DocumentId documentId,
-                              int page,
+    public DiscussionLocation(int page,
                               @Nullable Rectangle rectangle) {
-        this.documentId = documentId;
         this.page = page;
         this.rectangle = rectangle;
-    }
-
-    @NotNull
-    public DocumentId getDocumentId() {
-        return documentId;
     }
 
     public int getPage() {

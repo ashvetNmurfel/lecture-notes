@@ -11,15 +11,16 @@ import java.util.List;
  * Structure that will be returned to UI layer as a result of the discussion request.
  */
 public class Discussion {
-    protected DiscussionLocation location;
     protected DiscussionId discussionId;
     protected DiscussionStatus status;
     protected Date timestamp;
-    protected List<Comment> comments;
+    protected List<CommentId> comments;
 
-    @NotNull
-    public DiscussionLocation getLocation() {
-        return location;
+    public Discussion(DiscussionId discussionId, DiscussionStatus status, Date timestamp, List<CommentId> comments) {
+        this.discussionId = discussionId;
+        this.status = status;
+        this.timestamp = timestamp;
+        this.comments = comments;
     }
 
     @NotNull
@@ -28,7 +29,7 @@ public class Discussion {
     }
 
     @NotNull
-    public List<Comment> getComments() {
+    public List<CommentId> getComments() {
         return comments;
     }
 

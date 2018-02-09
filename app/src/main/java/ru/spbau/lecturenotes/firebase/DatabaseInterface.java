@@ -11,8 +11,10 @@ public interface DatabaseInterface {
     Discussion getDiscussion(DiscussionId discussion);
     Attachment getAttachment(AttachmentId attachment);
 
-    List<Document> getDocumentsList(GroupId group);
-    List<Group> getGroupList();
+    List<DocumentId> getDocumentsList(GroupId group);
+    List<GroupId> getGroupsList();
+    List<CommentId> getCommentsList(DiscussionId discussionId);
+    List<DiscussionId> getDiscussionsList(DocumentId documentId);
 
     DiscussionId addDiscussion(NewDiscussionRequest request);
     Discussion addComment(AddCommentRequest request /* contains DiscussionId */);

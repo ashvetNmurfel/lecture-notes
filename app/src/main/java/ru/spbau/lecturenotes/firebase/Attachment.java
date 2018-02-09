@@ -9,7 +9,7 @@ public class Attachment {
     protected AttachmentId attachmentId;
     protected AttachmentType type;
     protected Date creationTimestamp;
-    protected String path;
+    protected String reference;
 
     public AttachmentId getAttachmentId() {
         return attachmentId;
@@ -23,7 +23,7 @@ public class Attachment {
         return creationTimestamp;
     }
 
-    public String getPath() {
-        return path;
+    public String getReference() {
+        return reference;
     }
 }

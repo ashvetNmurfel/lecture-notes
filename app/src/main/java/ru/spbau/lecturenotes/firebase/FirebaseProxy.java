@@ -1,26 +1,91 @@
 package ru.spbau.lecturenotes.firebase;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.ServerTimestamp;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.sql.Date;
 import java.util.EventListener;
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
+
 public class FirebaseProxy implements DatabaseInterface {
     static FirebaseProxy INSTANCE = new FirebaseProxy();
+    protected FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
-    public Document getDocument(DocumentId document) {
-        return null;
+    public Document getDocument(final @NotNull DocumentId document) {
+        final DocumentReference docRef = db
+                .collection("groups")
+                .document(document.getGroupId().getKey())
+                .collection("docs")
+                .document(document.getKey());
+        final FirebaseDocument[] fdoc = new FirebaseDocument[1];
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if (documentSnapshot != null) {
+                        Log.d(TAG,  "Got document snapshot for Document: " + documentSnapshot.getId());
+                        fdoc[0] = documentSnapshot.toObject(FirebaseDocument.class);
+                    } else {
+                        Log.d(TAG, "Error: could not find snapshot for Document: " + document.getKey());
+                    }
+                } else {
+                    Log.d(TAG, "Attempt to get document snapshot for Document " +
+                            document.getKey() +
+                            " failed with", task.getException());
+                }
+            }
+        });
+        if (fdoc[0] == null) {
+            return null;
+        }
+
+        return FirebaseObjectsConvertor.toDocument(fdoc[0], getDiscussionsList(document));
     }
 
     @Override
-    public Discussion getDiscussion(DiscussionId discussion) {
-        return null;
+    public Discussion getDiscussion(final DiscussionId discussion) {
+        final DocumentReference docRef = db
+                .collection("groups")
+                .document(discussion.getDocumentId().getKey())
+                .collection("discussions")
+                .document(discussion.getKey());
+        final FirebaseDiscussion[] fdiscussion = new FirebaseDiscussion[1];
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if (documentSnapshot != null) {
+                        Log.d(TAG,  "Got document snapshot for Discussion: " + documentSnapshot.getId());
+                        fdiscussion[0] = documentSnapshot.toObject(FirebaseDiscussion.class);
+                    } else {
+                        Log.d(TAG, "Error: could not find snapshot for Discussion: " + discussion.getKey());
+                    }
+                } else {
+                    Log.d(TAG, "Attempt to get document snapshot for Discussion " +
+                            discussion.getKey() +
+                            " failed with", task.getException());
+                }
+            }
+        });
+        if (fdiscussion[0] == null) {
+            return null;
+        }
+        return FirebaseObjectsConvertor.toDiscussion(fdiscussion[0], getCommentsList(discussion));
     }
 
     @Override
@@ -29,12 +94,22 @@ public class FirebaseProxy implements DatabaseInterface {
     }
 
     @Override
-    public List<Document> getDocumentsList(GroupId group) {
+    public List<DocumentId> getDocumentsList(GroupId group) {
         return null;
     }
 
     @Override
-    public List<Group> getGroupList() {
+    public List<GroupId> getGroupsList() {
+        return null;
+    }
+
+    @Override
+    public List<CommentId> getCommentsList(DiscussionId discussionId) {
+        return null;
+    }
+
+    @Override
+    public List<DiscussionId> getDiscussionsList(DocumentId documentId) {
         return null;
     }
 
@@ -176,8 +251,7 @@ public class FirebaseProxy implements DatabaseInterface {
     }
 
     static public class FirebaseDiscussion {
-        protected DiscussionLocation location;
-        protected String key;
+        protected DiscussionId id;
         protected String status;
         @ServerTimestamp
         protected Date timestamp;
@@ -185,20 +259,8 @@ public class FirebaseProxy implements DatabaseInterface {
         public FirebaseDiscussion() {
         }
 
-        public FirebaseDiscussion(@NotNull final Discussion discussion) {
-            location = discussion.getLocation();
-            key = discussion.discussionId.getKey();
-            status = discussion.getStatus().toString();
-        }
-
-        @NotNull
-        public DiscussionLocation getLocation() {
-            return location;
-        }
-
-        @NotNull
-        public String getKey() {
-            return key;
+        public DiscussionId getId() {
+            return id;
         }
 
         @NotNull
@@ -214,7 +276,6 @@ public class FirebaseProxy implements DatabaseInterface {
 
     static public class FirebaseDocument {
         protected DocumentId id;
-        protected String filename;
         protected String storageReference;
         @ServerTimestamp
         protected Date updateTimestamp;
@@ -225,11 +286,6 @@ public class FirebaseProxy implements DatabaseInterface {
         @NotNull
         public DocumentId getId() {
             return id;
-        }
-
-        @NotNull
-        public String getFilename() {
-            return filename;
         }
 
         @NotNull

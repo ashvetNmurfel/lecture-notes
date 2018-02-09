@@ -8,25 +8,27 @@ import java.util.List;
  */
 public class Document {
     protected DocumentId id;
-    protected String filename;
     protected List<DiscussionId> discussions;
-    protected String path;
+    protected String reference;
     protected Date updateTimestamp;
+
+    public Document(DocumentId id, List<DiscussionId> discussions, String reference, Date updateTimestamp) {
+        this.id = id;
+        this.discussions = discussions;
+        this.reference = reference;
+        this.updateTimestamp = updateTimestamp;
+    }
 
     public DocumentId getId() {
         return id;
-    }
-
-    public String getFilename() {
-        return filename;
     }
 
     public List<DiscussionId> getDiscussions() {
         return discussions;
     }
 
-    public String getPath() {
-        return path;
+    public String getReference() {
+        return reference;
     }
 
     public Date getUpdateTimestamp() {
