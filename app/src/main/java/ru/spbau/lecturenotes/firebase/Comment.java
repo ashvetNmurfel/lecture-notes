@@ -1,18 +1,19 @@
 package ru.spbau.lecturenotes.firebase;
 
-import com.google.firebase.firestore.ServerTimestamp;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Date;
 
+
+/**
+ * Structure that will be returned to UI layer as a result of the comment request.
+ */
 class Comment {
     protected CommentId id;
     protected CommentId parentId;
     protected CommentContent content;
     protected User author;
-    @ServerTimestamp
     protected Date creationTimestamp;
     protected boolean isEdited;
     protected Date editTimestamp;

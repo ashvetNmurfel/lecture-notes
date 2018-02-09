@@ -8,6 +8,7 @@ public interface DatabaseInterface {
 
     Document getDocument(DocumentId document);
     Discussion getDiscussion(DiscussionId discussion);
+    Attachment getAttachment(AttachmentId attachment);
     DiscussionId createDiscussion(NewDiscussionRequest request);
     Discussion addComment(AddCommentRequest request /* contains DiscussionId */);
 

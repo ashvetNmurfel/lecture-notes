@@ -1,14 +1,20 @@
 package ru.spbau.lecturenotes.firebase;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import ru.spbau.lecturenotes.data.PdfComment;
+import java.sql.Date;
 
+
+/**
+ * Structure that will be returned to UI layer as a result of the discussion request.
+ */
 class Discussion {
     protected DiscussionLocation location;
     protected DiscussionId discussionId;
     protected Comment rootComment;
     protected DiscussionStatus status;
+    protected Date timestamp;
 
     public Discussion(@NotNull final DiscussionLocation location,
                       @NotNull final DiscussionId discussionId,
@@ -37,5 +43,10 @@ class Discussion {
     @NotNull
     public DiscussionStatus getStatus() {
         return status;
+    }
+
+    @Nullable
+    public Date getTimestamp() {
+        return timestamp;
     }
 }
