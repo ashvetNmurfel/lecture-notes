@@ -16,7 +16,9 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import org.androidannotations.rclass.IRClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -303,7 +305,7 @@ public class FirebaseProxy implements DatabaseInterface {
     }
 
     @Override
-    public Discussion addDiscussion(final NewDiscussionRequest request) throws FileNotFoundException {
+    public void addDiscussion(final NewDiscussionRequest request, final ResultListener<Discussion> listener) {
         Log.i(TAG, "Attempting to add Discussion to the Document " + request.getDocumentId().getKey());
         final DocumentReference docRef = db
                 .collection(FirebaseCollections.GROUPS.str())
@@ -321,23 +323,30 @@ public class FirebaseProxy implements DatabaseInterface {
             public void onSuccess(Void aVoid) {
                 Log.i(TAG, "Discussion " + docRef.getId() +
                         " was successfully written to Document " + request.getDocumentId().getKey());
+                addComment(new AddCommentRequest(discussion.id, request.getDiscussion().getComment()), new ResultListener<Discussion>() {
+                    @Override
+                    public void onResult(Discussion result) {
+                        listener.onResult(result);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        docRef.delete();
+                        listener.onError(error);
+                    }
+                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.e(TAG, "Failed to add a new discussion to Document " + request.getDocumentId().getKey(), e);
-                discussion.id = null;
+                listener.onError(e);
             }
         });
-        if (discussion.id == null) {
-            return null;
-        }
-
-        return addComment(new AddCommentRequest(discussion.id, request.getDiscussion().getComment()));
     }
 
     @Override
-    public Discussion addComment(final AddCommentRequest request) throws FileNotFoundException {
+    public void addComment(final AddCommentRequest request, ResultListener<Discussion> listener) {
         Log.i(TAG, "Attempting to add Comment to the Discussion" + request.getDiscussionId().getKey());
         DocumentReference docRef = db
                 .collection(FirebaseCollections.GROUPS.str())
@@ -356,86 +365,114 @@ public class FirebaseProxy implements DatabaseInterface {
         comment.creationTimestamp = null;
         comment.editTimestamp = null;
         comment.content.text = request.getComment().getText();
-        comment.content.attachments = new FirebaseAttachment[request.getComment().getAttachments().size()];
+        new AttachmentUploaderListener(comment, docRef, request.getComment().getAttachments(), listener).uploadNextAttachment();
+    }
 
-        {
-            int cnt = 0;
-            for (AttachmentSketch attachment : request.getComment().getAttachments()) {
-                Attachment newAttachment = addAttachment(new NewAttachmentRequest(
-                        new CommentId(request.getDiscussionId(), docRef.getId()),
-                        attachment));
-                if (newAttachment == null)
-                    return null;
-                comment.content.attachments[cnt++] = new FirebaseAttachment(newAttachment);
-            }
-        }
-        docRef.set(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.i(TAG, "New Comment was added to Discussion: " + request.getDiscussionId().getKey());
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "An error occurred while trying to add a comment to Discussion " + request.getDiscussionId().getKey());
-                comment.id = null;
-            }
-        });
+    private class AttachmentUploaderListener implements ResultListener<Attachment> {
+        protected FirebaseComment comment;
+        protected DocumentReference docRef;
+        protected List<AttachmentSketch> attachments;
+        protected ResultListener<Discussion> listener;
+        protected List<FirebaseAttachment> uploadedAttachments = new ArrayList<>();
 
-        if (comment.id == null) {
-            return null;
+        public AttachmentUploaderListener(FirebaseComment comment, DocumentReference docRef, List<AttachmentSketch> attachments, ResultListener<Discussion> listener) {
+            this.comment = comment;
+            this.docRef = docRef;
+            this.attachments = attachments;
+            this.listener = listener;
         }
-        return null;
-        //return getDiscussion(request.getDiscussionId());
+
+        public void uploadNextAttachment() {
+            if (attachments.size() == uploadedAttachments.size()) {
+                comment.content.attachments = uploadedAttachments.toArray(new FirebaseAttachment[attachments.size()]);
+                docRef.set(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.i(TAG, "New Comment was added to Discussion: ");
+                        getDiscussion(comment.getId().getDiscussion(), listener);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "An error occurred while trying to add a comment to Discussion ");
+                        listener.onError(e);
+                    }
+                });
+                return;
+            }
+            AttachmentSketch attachmentSketch = attachments.get(uploadedAttachments.size());
+            NewAttachmentRequest newAttachmentRequest = new NewAttachmentRequest(comment.getId(), attachmentSketch);
+            addAttachment(newAttachmentRequest, this);
+        }
+
+        @Override
+        public void onResult(Attachment result) {
+            uploadedAttachments.add(new FirebaseAttachment(result));
+            uploadNextAttachment();
+        }
+
+        @Override
+        public void onError(Throwable error) {
+            listener.onError(error);
+        }
     }
 
     @Override
-    public Attachment addAttachment(final NewAttachmentRequest request) throws FileNotFoundException {
+    public void addAttachment(final NewAttachmentRequest request, final @NotNull ResultListener<Attachment> listener) {
         final String attachmentPath = "attachments/" + request.getCommentId().getGroupId().getKey() +
                 FirebaseAuth.getInstance().getUid() + "/" + UUID.randomUUID();
         StorageReference storageReference = storage.getReference();
-        StorageReference attachmentReference = storageReference.child(attachmentPath);
-        // Todo: create thread to upload in parallel
-        // Todo: add listeners
-        attachmentReference.putStream(new FileInputStream(new File(request.getAttachment().getPath())))
+        final StorageReference attachmentReference = storageReference.child(attachmentPath);
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(new File(request.getAttachment().getPath()));
+        } catch (FileNotFoundException e) {
+            listener.onError(e);
+            return;
+        }
+        attachmentReference.putStream(inputStream)
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "Could not upload image " + request.getAttachment().getPath()
+                        Log.e(TAG, "Could not upload attachment " + request.getAttachment().getPath()
                                 + " to a storage location: " + attachmentPath, e);
+                        listener.onError(e);
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.i(TAG, "Successfully uploaded attachment to the storage");
+                DocumentReference docRef = db
+                        .collection(FirebaseCollections.GROUPS.str())
+                        .document(request.getCommentId().getGroupId().getKey())
+                        .collection(FirebaseCollections.DOCS.str())
+                        .document(request.getCommentId().getDocumentId().getKey())
+                        .collection(FirebaseCollections.DISCUSSIONS.str())
+                        .document(request.getCommentId().getDiscussion().getKey())
+                        .collection(FirebaseCollections.ATTACHMENTS.str())
+                        .document();
+                final FirebaseAttachment firebaseAttachment = new FirebaseAttachment();
+                firebaseAttachment.creationTimestamp = null;
+                firebaseAttachment.type = null;
+                firebaseAttachment.id = new AttachmentId(request.getCommentId(), docRef.getId());
+                firebaseAttachment.storageReference = attachmentPath;
+                docRef.set(firebaseAttachment).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Failed to add Attachment for the path: " + request.getAttachment().getPath(), e);
+                        attachmentReference.delete();
+                        // todo: just log it ^
+                        listener.onError(e);
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.i(TAG, "Loaded Attachment to the Discussion: " + request.getCommentId().getDiscussion().getKey());
+                        getAttachment(firebaseAttachment.getId(), listener);
                     }
                 });
-        DocumentReference docRef = db
-                .collection(FirebaseCollections.GROUPS.str())
-                .document(request.getCommentId().getGroupId().getKey())
-                .collection(FirebaseCollections.DOCS.str())
-                .document(request.getCommentId().getDocumentId().getKey())
-                .collection(FirebaseCollections.DISCUSSIONS.str())
-                .document(request.getCommentId().getDiscussion().getKey())
-                .collection(FirebaseCollections.ATTACHMENTS.str())
-                .document();
-        final FirebaseAttachment firebaseAttachment = new FirebaseAttachment();
-        firebaseAttachment.creationTimestamp = null;
-        firebaseAttachment.type = null;
-        firebaseAttachment.id = new AttachmentId(request.getCommentId(), docRef.getId());
-        firebaseAttachment.storageReference = attachmentPath;
-        docRef.set(firebaseAttachment).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                firebaseAttachment.id = null;
-                Log.e(TAG, "Failed to add Attachment for the path: " + request.getAttachment().getPath(), e);
-            }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.i(TAG, "Loaded Attachment to the Discussion: " + request.getCommentId().getDiscussion().getKey());
             }
         });
-        if (firebaseAttachment.id == null) {
-            return null;
-        }
-        return null;
-        //return getAttachment(firebaseAttachment.getId());
     }
 
     @Override

@@ -36,11 +36,11 @@ public interface DatabaseInterface {
 
     void getDiscussionsList(DocumentId documentId, ResultListener<List<DiscussionId>> listener);
 
-    Discussion addDiscussion(NewDiscussionRequest request) throws FileNotFoundException;
+    void addDiscussion(NewDiscussionRequest request, ResultListener<Discussion> listener);
 
-    Discussion addComment(AddCommentRequest request /* contains DiscussionId */) throws FileNotFoundException;
+    void addComment(AddCommentRequest request /* contains DiscussionId */, ResultListener<Discussion> listener);
 
-    Attachment addAttachment(NewAttachmentRequest request) throws FileNotFoundException;
+    void addAttachment(NewAttachmentRequest request, ResultListener<Attachment> listener);
 
     ListenerRegistration setDocumentListListener(EventListener listener, GroupId group);
 
