@@ -12,13 +12,11 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import org.androidannotations.rclass.IRClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -29,8 +27,8 @@ import java.util.EventListener;
 import java.util.List;
 import java.util.UUID;
 
-import ru.spbau.lecturenotes.storage.Comment;
 import ru.spbau.lecturenotes.storage.DatabaseInterface;
+import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.requests.AddCommentRequest;
 import ru.spbau.lecturenotes.storage.requests.AttachmentSketch;
@@ -476,22 +474,22 @@ public class FirebaseProxy implements DatabaseInterface {
     }
 
     @Override
-    public ListenerRegistration setDocumentListListener(EventListener listener, GroupId group) {
+    public ListenerController setDocumentListListener(EventListener listener, GroupId group) {
         return null;
     }
 
     @Override
-    public ListenerRegistration setGroupsListListener(EventListener listener) {
+    public ListenerController setGroupsListListener(EventListener listener) {
         return null;
     }
 
     @Override
-    public ListenerRegistration setDocumentListener(DocumentId document, EventListener listener) {
+    public ListenerController setDocumentListener(DocumentId document, EventListener listener) {
         return null;
     }
 
     @Override
-    public ListenerRegistration setDiscussionListener(DiscussionId discussion, EventListener listener) {
+    public ListenerController setDiscussionListener(DiscussionId discussion, EventListener listener) {
         return null;
     }
 }

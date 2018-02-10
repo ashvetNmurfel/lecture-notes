@@ -1,7 +1,5 @@
 package ru.spbau.lecturenotes.storage;
 
-import com.google.firebase.firestore.ListenerRegistration;
-
 import org.androidannotations.rclass.IRClass;
 
 import java.io.FileNotFoundException;
@@ -42,12 +40,12 @@ public interface DatabaseInterface {
 
     void addAttachment(NewAttachmentRequest request, ResultListener<Attachment> listener);
 
-    ListenerRegistration setDocumentListListener(EventListener listener, GroupId group);
+    ListenerController setDocumentListListener(EventListener listener, GroupId group);
 
-    ListenerRegistration setGroupsListListener(EventListener listener);
+    ListenerController setGroupsListListener(EventListener listener);
 
-    ListenerRegistration setDocumentListener(DocumentId document, EventListener listener);
+    ListenerController setDocumentListener(DocumentId document, EventListener listener);
 
-    ListenerRegistration setDiscussionListener(DiscussionId discussion, EventListener listener);
+    ListenerController setDiscussionListener(DiscussionId discussion, EventListener listener);
 }
 
