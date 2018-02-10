@@ -2,16 +2,15 @@ package ru.spbau.lecturenotes.firebase;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-
 public class AttachmentSketch {
-    protected File attachmentFile;
+    protected String path;
 
-    public AttachmentSketch(File attachmentFile) {
-        this.attachmentFile = attachmentFile;
+    public AttachmentSketch(String attachmentFile) {
+        this.path = attachmentFile;
     }
 
-    public File getAttachmentFile() {
-        return attachmentFile;
+    @NotNull
+    public String getPath() {
+        return path;
     }
 }

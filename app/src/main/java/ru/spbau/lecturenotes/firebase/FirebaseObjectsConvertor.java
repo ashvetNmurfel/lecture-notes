@@ -23,4 +23,12 @@ public class FirebaseObjectsConvertor {
         );
     }
 
+    public static Attachment toAttachment(@NotNull final FirebaseProxy.FirebaseAttachment fattachment) {
+        return new Attachment(
+                fattachment.getId(),
+                AttachmentType.valueOf(fattachment.getType()),
+                fattachment.getCreationTimestamp(),
+                fattachment.getStorageReference()
+        );
+    }
 }
