@@ -2,6 +2,8 @@ package ru.spbau.lecturenotes.storage;
 
 import com.google.firebase.firestore.ListenerRegistration;
 
+import org.androidannotations.rclass.IRClass;
+
 import java.io.FileNotFoundException;
 import java.util.EventListener;
 import java.util.List;
@@ -20,22 +22,32 @@ import ru.spbau.lecturenotes.storage.GroupId;
 
 public interface DatabaseInterface {
 
-    Document getDocument(DocumentId document);
-    Discussion getDiscussion(DiscussionId discussion);
-    Attachment getAttachment(AttachmentId attachment);
+    void getDocument(DocumentId document, ResultListener<Document> listener);
 
-    List<DocumentId> getDocumentsList(GroupId group);
-    List<GroupId> getGroupsList();
-    List<CommentId> getCommentsList(DiscussionId discussionId);
-    List<DiscussionId> getDiscussionsList(DocumentId documentId);
+    void getDiscussion(DiscussionId discussion, ResultListener<Discussion> listener);
+
+    void getAttachment(AttachmentId attachment, ResultListener<Attachment> listener);
+
+    void getDocumentsList(GroupId group, ResultListener<List<DocumentId>> listener);
+
+    void getGroupsList(ResultListener<List<GroupId>> listener);
+
+    void getCommentsList(DiscussionId discussionId, ResultListener<List<CommentId>> listResultListener);
+
+    void getDiscussionsList(DocumentId documentId, ResultListener<List<DiscussionId>> listener);
 
     Discussion addDiscussion(NewDiscussionRequest request) throws FileNotFoundException;
+
     Discussion addComment(AddCommentRequest request /* contains DiscussionId */) throws FileNotFoundException;
+
     Attachment addAttachment(NewAttachmentRequest request) throws FileNotFoundException;
 
     ListenerRegistration setDocumentListListener(EventListener listener, GroupId group);
+
     ListenerRegistration setGroupsListListener(EventListener listener);
+
     ListenerRegistration setDocumentListener(DocumentId document, EventListener listener);
+
     ListenerRegistration setDiscussionListener(DiscussionId discussion, EventListener listener);
 }
 
