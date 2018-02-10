@@ -4,21 +4,18 @@ import java.io.File;
 
 public class NewAttachmentRequest {
     protected CommentId commentId;
-    protected File attachmentFile;
-    protected AttachmentType type;
+    protected AttachmentSketch attachment;
 
-    public NewAttachmentRequest() {
+    public NewAttachmentRequest(CommentId commentId, AttachmentSketch attachment) {
+        this.commentId = commentId;
+        this.attachment = attachment;
     }
 
     public CommentId getCommentId() {
         return commentId;
     }
 
-    public File getAttachmentFile() {
-        return attachmentFile;
-    }
-
-    public AttachmentType getType() {
-        return type;
+    public AttachmentSketch getAttachment() {
+        return attachment;
     }
 }

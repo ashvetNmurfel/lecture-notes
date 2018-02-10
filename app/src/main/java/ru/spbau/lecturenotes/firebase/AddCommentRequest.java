@@ -4,10 +4,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class AddCommentRequest {
     protected DiscussionId discussionId;
-    protected Comment comment;
+    protected CommentSketch comment;
 
     public AddCommentRequest(@NotNull final DiscussionId discussionId,
-                             @NotNull final Comment comment) {
+                             @NotNull final CommentSketch comment) {
         this.discussionId = discussionId;
         this.comment = comment;
     }
@@ -16,7 +16,7 @@ public class AddCommentRequest {
         return discussionId;
     }
 
-    public Comment getComment() {
+    public CommentSketch getComment() {
         return comment;
     }
 }

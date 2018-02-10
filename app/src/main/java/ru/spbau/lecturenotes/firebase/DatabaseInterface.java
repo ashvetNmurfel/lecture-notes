@@ -2,6 +2,7 @@ package ru.spbau.lecturenotes.firebase;
 
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.io.FileNotFoundException;
 import java.util.EventListener;
 import java.util.List;
 
@@ -16,8 +17,9 @@ public interface DatabaseInterface {
     List<CommentId> getCommentsList(DiscussionId discussionId);
     List<DiscussionId> getDiscussionsList(DocumentId documentId);
 
-    DiscussionId addDiscussion(NewDiscussionRequest request);
-    Discussion addComment(AddCommentRequest request /* contains DiscussionId */);
+    Discussion addDiscussion(NewDiscussionRequest request) throws FileNotFoundException;
+    Discussion addComment(AddCommentRequest request /* contains DiscussionId */) throws FileNotFoundException;
+    Attachment addAttachment(NewAttachmentRequest request) throws FileNotFoundException;
 
     ListenerRegistration setDocumentListListener(EventListener listener, GroupId group);
     ListenerRegistration setGroupsListListener(EventListener listener);

@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Date;
-import java.util.List;
 
 
 /**
@@ -20,7 +19,7 @@ public class Comment {
     protected Date editTimestamp;
 
 
-    @NotNull
+    @Nullable
     public CommentId getId() {
         return id;
     }

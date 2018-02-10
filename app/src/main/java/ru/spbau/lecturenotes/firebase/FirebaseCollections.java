@@ -1,8 +1,21 @@
 package ru.spbau.lecturenotes.firebase;
 
-/**
- * Created by annikura on 2/10/18.
- */
+import org.jetbrains.annotations.NotNull;
 
 public enum FirebaseCollections {
+    GROUPS("groups"),
+    DOCS("documents"),
+    DISCUSSIONS("discussions"),
+    COMMENTS("comments"),
+    ATTACHMENTS("attachments");
+
+    private String str;
+
+    FirebaseCollections(@NotNull final String str) {
+        this.str = str;
+    }
+
+    public String str() {
+        return str;
+    }
 }

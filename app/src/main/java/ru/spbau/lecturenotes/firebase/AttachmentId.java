@@ -6,6 +6,11 @@ public class AttachmentId {
     protected CommentId commentId;
     protected String key;
 
+    public AttachmentId(CommentId commentId, String key) {
+        this.commentId = commentId;
+        this.key = key;
+    }
+
     public AttachmentId() {
     }
 

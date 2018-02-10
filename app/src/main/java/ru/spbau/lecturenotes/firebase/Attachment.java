@@ -11,6 +11,13 @@ public class Attachment {
     protected Date creationTimestamp;
     protected String reference;
 
+    public Attachment(AttachmentId attachmentId, AttachmentType type, Date creationTimestamp, String reference) {
+        this.attachmentId = attachmentId;
+        this.type = type;
+        this.creationTimestamp = creationTimestamp;
+        this.reference = reference;
+    }
+
     public AttachmentId getAttachmentId() {
         return attachmentId;
     }

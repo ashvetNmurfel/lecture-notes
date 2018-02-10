@@ -2,13 +2,13 @@ package ru.spbau.lecturenotes.firebase;
 
 public class CommentContent {
     protected String text;
-    protected AttachmentId[] attachmentsIds;
+    protected Attachment[] attachments;
 
     public String getText() {
         return text;
     }
 
-    public AttachmentId[] getAttachmentsIds() {
-        return attachmentsIds;
+    public Attachment[] getAttachments() {
+        return attachments;
     }
 }

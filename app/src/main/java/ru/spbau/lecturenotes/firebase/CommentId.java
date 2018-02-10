@@ -6,6 +6,11 @@ public class CommentId {
     protected DiscussionId discussion;
     protected String key;
 
+    public CommentId(@NotNull DiscussionId discussion, @NotNull String key) {
+        this.discussion = discussion;
+        this.key = key;
+    }
+
     @NotNull
     public DiscussionId getDiscussion() {
         return discussion;
