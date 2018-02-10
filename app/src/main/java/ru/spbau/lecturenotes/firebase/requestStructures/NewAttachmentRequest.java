@@ -1,6 +1,6 @@
-package ru.spbau.lecturenotes.firebase;
+package ru.spbau.lecturenotes.firebase.requestStructures;
 
-import java.io.File;
+import ru.spbau.lecturenotes.firebase.uiData.CommentId;
 
 public class NewAttachmentRequest {
     protected CommentId commentId;

@@ -4,6 +4,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import ru.spbau.lecturenotes.firebase.uiData.Attachment;
+import ru.spbau.lecturenotes.firebase.uiData.AttachmentType;
+import ru.spbau.lecturenotes.firebase.uiData.CommentId;
+import ru.spbau.lecturenotes.firebase.uiData.Discussion;
+import ru.spbau.lecturenotes.firebase.uiData.DiscussionId;
+import ru.spbau.lecturenotes.firebase.uiData.DiscussionStatus;
+import ru.spbau.lecturenotes.firebase.uiData.Document;
+
 public class FirebaseObjectsConvertor {
     public static Document toDocument(@NotNull final FirebaseProxy.FirebaseDocument fdoc,
                                       @NotNull final List<DiscussionId> discussions) {

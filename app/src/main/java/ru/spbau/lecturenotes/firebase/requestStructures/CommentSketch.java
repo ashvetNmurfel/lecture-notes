@@ -1,8 +1,10 @@
-package ru.spbau.lecturenotes.firebase;
+package ru.spbau.lecturenotes.firebase.requestStructures;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import ru.spbau.lecturenotes.firebase.uiData.User;
 
 public class CommentSketch {
     protected String text;

@@ -6,6 +6,18 @@ import java.io.FileNotFoundException;
 import java.util.EventListener;
 import java.util.List;
 
+import ru.spbau.lecturenotes.firebase.requestStructures.AddCommentRequest;
+import ru.spbau.lecturenotes.firebase.requestStructures.NewAttachmentRequest;
+import ru.spbau.lecturenotes.firebase.requestStructures.NewDiscussionRequest;
+import ru.spbau.lecturenotes.firebase.uiData.Attachment;
+import ru.spbau.lecturenotes.firebase.uiData.AttachmentId;
+import ru.spbau.lecturenotes.firebase.uiData.CommentId;
+import ru.spbau.lecturenotes.firebase.uiData.Discussion;
+import ru.spbau.lecturenotes.firebase.uiData.DiscussionId;
+import ru.spbau.lecturenotes.firebase.uiData.Document;
+import ru.spbau.lecturenotes.firebase.uiData.DocumentId;
+import ru.spbau.lecturenotes.firebase.uiData.GroupId;
+
 public interface DatabaseInterface {
 
     Document getDocument(DocumentId document);

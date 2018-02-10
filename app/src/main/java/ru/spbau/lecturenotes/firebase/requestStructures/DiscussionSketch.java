@@ -1,6 +1,8 @@
-package ru.spbau.lecturenotes.firebase;
+package ru.spbau.lecturenotes.firebase.requestStructures;
 
 import org.jetbrains.annotations.NotNull;
+
+import ru.spbau.lecturenotes.firebase.uiData.DiscussionLocation;
 
 public class DiscussionSketch {
     protected CommentSketch comment;

@@ -1,4 +1,4 @@
-package ru.spbau.lecturenotes.firebase;
+package ru.spbau.lecturenotes.firebase.uiData;
 
 public class CommentContent {
     protected String text;

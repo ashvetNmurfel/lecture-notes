@@ -23,14 +23,26 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 import java.util.UUID;
+
+import ru.spbau.lecturenotes.firebase.requestStructures.AddCommentRequest;
+import ru.spbau.lecturenotes.firebase.requestStructures.AttachmentSketch;
+import ru.spbau.lecturenotes.firebase.requestStructures.NewAttachmentRequest;
+import ru.spbau.lecturenotes.firebase.requestStructures.NewDiscussionRequest;
+import ru.spbau.lecturenotes.firebase.uiData.Attachment;
+import ru.spbau.lecturenotes.firebase.uiData.AttachmentId;
+import ru.spbau.lecturenotes.firebase.uiData.CommentId;
+import ru.spbau.lecturenotes.firebase.uiData.Discussion;
+import ru.spbau.lecturenotes.firebase.uiData.DiscussionId;
+import ru.spbau.lecturenotes.firebase.uiData.DiscussionStatus;
+import ru.spbau.lecturenotes.firebase.uiData.Document;
+import ru.spbau.lecturenotes.firebase.uiData.DocumentId;
+import ru.spbau.lecturenotes.firebase.uiData.GroupId;
+import ru.spbau.lecturenotes.firebase.uiData.User;
 
 import static android.content.ContentValues.TAG;
 
@@ -250,7 +262,7 @@ public class FirebaseProxy implements DatabaseInterface {
 
     @Override
     public Discussion addDiscussion(final NewDiscussionRequest request) throws FileNotFoundException {
-        Log.i(TAG, "Attempting to add Discussion to the Document " + request.documentId.getKey());
+        Log.i(TAG, "Attempting to add Discussion to the Document " + request.getDocumentId().getKey());
         final DocumentReference docRef = db
                 .collection(FirebaseCollections.GROUPS.str())
                 .document(request.getDocumentId().getGroupId().getKey())
