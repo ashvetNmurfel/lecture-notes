@@ -2,19 +2,26 @@ package ru.spbau.lecturenotes.storage.requests;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import ru.spbau.lecturenotes.storage.User;
 
 public class CommentSketch {
     protected String text;
     protected List<AttachmentSketch> attachments;
-    protected User author;
 
-    public CommentSketch(@NotNull String text, @NotNull List<AttachmentSketch> attachments, @NotNull User author) {
+    public CommentSketch(@NotNull String text, @NotNull List<AttachmentSketch> attachments) {
         this.text = text;
         this.attachments = attachments;
-        this.author = author;
+    }
+
+    public CommentSketch(@NotNull String text) {
+        this.text = text;
+        this.attachments = new ArrayList<>();
+    }
+
+    public void addAttachments(final @NotNull AttachmentSketch... attachments) {
+        Collections.addAll(this.attachments, attachments);
     }
 
     @NotNull
@@ -25,10 +32,5 @@ public class CommentSketch {
     @NotNull
     public List<AttachmentSketch> getAttachments() {
         return attachments;
-    }
-
-    @NotNull
-    public User getAuthor() {
-        return author;
     }
 }

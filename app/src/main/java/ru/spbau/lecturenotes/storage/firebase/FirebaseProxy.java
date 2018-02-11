@@ -32,6 +32,7 @@ import java.util.function.Function;
 import ru.spbau.lecturenotes.storage.DatabaseInterface;
 import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.ResultListener;
+import ru.spbau.lecturenotes.storage.User;
 import ru.spbau.lecturenotes.storage.requests.AddCommentRequest;
 import ru.spbau.lecturenotes.storage.requests.AttachmentSketch;
 import ru.spbau.lecturenotes.storage.requests.NewAttachmentRequest;
@@ -52,6 +53,7 @@ public class FirebaseProxy implements DatabaseInterface {
     static FirebaseProxy INSTANCE = new FirebaseProxy();
     protected FirebaseFirestore db = FirebaseFirestore.getInstance();
     protected FirebaseStorage storage = FirebaseStorage.getInstance();
+    protected FirebaseAuth auth = FirebaseAuth.getInstance();
 
     @Override
     public void getDocument(final @NotNull DocumentId document, final ResultListener<Document> listener) {
@@ -220,7 +222,7 @@ public class FirebaseProxy implements DatabaseInterface {
         Log.i(TAG, "Attempting to get Group list");
         final CollectionReference collRef = Schema.groups(db);
         collRef
-                .whereEqualTo("permissions." + FirebaseAuth.getInstance().getUid(), true)
+                .whereEqualTo("permissions." + auth.getUid(), true)
                 .get().addOnCompleteListener(
             new LoadListListener<>(FirebaseGroup.class, listener, new Function<FirebaseGroup, GroupId>() {
                 @Override
@@ -301,7 +303,7 @@ public class FirebaseProxy implements DatabaseInterface {
 
         final FirebaseComment comment = new FirebaseComment();
         comment.id = new CommentId(request.getDiscussionId(), docRef.getId());
-        comment.author = request.getComment().getAuthor();
+        comment.author = new User(auth.getUid());
         comment.creationTimestamp = null;
         comment.editTimestamp = null;
         comment.content.text = request.getComment().getText();
