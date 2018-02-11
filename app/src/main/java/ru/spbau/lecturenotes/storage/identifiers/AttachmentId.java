@@ -6,12 +6,9 @@ public class AttachmentId {
     protected CommentId commentId;
     protected String key;
 
-    public AttachmentId(CommentId commentId, String key) {
+    public AttachmentId(final @NotNull CommentId commentId, final @NotNull String key) {
         this.commentId = commentId;
         this.key = key;
-    }
-
-    public AttachmentId() {
     }
 
     @NotNull
@@ -20,8 +17,8 @@ public class AttachmentId {
     }
 
     @NotNull
-    public DiscussionId getDiscussion() {
-        return commentId.getDiscussion();
+    public DiscussionId getDiscussionId() {
+        return commentId.getDiscussionId();
     }
 
     @NotNull

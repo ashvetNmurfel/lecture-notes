@@ -7,7 +7,7 @@ import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 
 /**
- * Structure that will be returned to UI layer as a result of the document request.
+ * Structure that will be returned to UI layer as a result of the documentId request.
  */
 public class Document {
     protected DocumentId id;

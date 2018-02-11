@@ -11,7 +11,7 @@ import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 
 
 /**
- * Structure that will be returned to UI layer as a result of the discussion request.
+ * Structure that will be returned to UI layer as a result of the discussionId request.
  */
 public class Discussion {
     protected DiscussionId discussionId;

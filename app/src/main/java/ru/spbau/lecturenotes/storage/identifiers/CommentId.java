@@ -3,27 +3,28 @@ package ru.spbau.lecturenotes.storage.identifiers;
 import org.jetbrains.annotations.NotNull;
 
 public class CommentId {
-    protected DiscussionId discussion;
+    protected DiscussionId discussionId;
     protected String key;
 
-    public CommentId(@NotNull DiscussionId discussion, @NotNull String key) {
-        this.discussion = discussion;
+    public CommentId(final @NotNull DiscussionId discussionId,
+                     final @NotNull String key) {
+        this.discussionId = discussionId;
         this.key = key;
     }
 
     @NotNull
-    public DiscussionId getDiscussion() {
-        return discussion;
+    public DiscussionId getDiscussionId() {
+        return discussionId;
     }
 
     @NotNull
     public GroupId getGroupId() {
-        return discussion.getGroupId();
+        return discussionId.getGroupId();
     }
 
     @NotNull
     public DocumentId getDocumentId() {
-        return discussion.getDocumentId();
+        return discussionId.getDocumentId();
     }
 
     @NotNull

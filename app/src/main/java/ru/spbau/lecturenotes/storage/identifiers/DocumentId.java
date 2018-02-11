@@ -15,14 +15,17 @@ public class DocumentId {
         this.filename = filename;
     }
 
+    @NotNull
     public GroupId getGroupId() {
         return groupId;
     }
 
+    @NotNull
     public String getKey() {
         return key;
     }
 
+    @NotNull
     public String getFilename() {
         return filename;
     }

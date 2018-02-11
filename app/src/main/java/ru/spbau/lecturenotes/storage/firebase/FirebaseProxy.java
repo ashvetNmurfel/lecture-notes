@@ -65,7 +65,7 @@ public class FirebaseProxy implements DatabaseInterface {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot != null) {
-                        Log.i(TAG, "Got document snapshot for Document: " + documentSnapshot.getId());
+                        Log.i(TAG, "Got documentId snapshot for Document: " + documentSnapshot.getId());
                         FirebaseDocument firebaseDocument = documentSnapshot.toObject(FirebaseDocument.class);
                         getDiscussionsList(document, new LoadDiscussionListResultListener(
                                 firebaseDocument, listener));
@@ -74,7 +74,7 @@ public class FirebaseProxy implements DatabaseInterface {
                         listener.onError(new IllegalArgumentException("...."));
                     }
                 } else {
-                    Log.e(TAG, "Attempt to get document snapshot for Document " +
+                    Log.e(TAG, "Attempt to get documentId snapshot for Document " +
                             document.getKey() +
                             " failed with", task.getException());
                     listener.onError(task.getException());
@@ -115,7 +115,7 @@ public class FirebaseProxy implements DatabaseInterface {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot != null) {
-                        Log.i(TAG, "Got document snapshot for Discussion: " + documentSnapshot.getId());
+                        Log.i(TAG, "Got documentId snapshot for Discussion: " + documentSnapshot.getId());
                         getCommentsList(discussion,
                                 new LoadCommentsListResultListener(documentSnapshot.toObject(FirebaseDiscussion.class), listener));
                     } else {
@@ -123,7 +123,7 @@ public class FirebaseProxy implements DatabaseInterface {
                         listener.onError(new IllegalArgumentException("...."));
                     }
                 } else {
-                    Log.e(TAG, "Attempt to get document snapshot for Discussion " +
+                    Log.e(TAG, "Attempt to get documentId snapshot for Discussion " +
                             discussion.getKey() + " failed with", task.getException());
                     listener.onError(task.getException());
                 }
@@ -161,7 +161,7 @@ public class FirebaseProxy implements DatabaseInterface {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot != null) {
-                        Log.i(TAG, "Got document snapshot for Attachment: " + documentSnapshot.getId());
+                        Log.i(TAG, "Got documentId snapshot for Attachment: " + documentSnapshot.getId());
                         listener.onResult(FirebaseObjectsConvertor
                                 .toAttachment(documentSnapshot.toObject(FirebaseAttachment.class)));
                     } else {
@@ -169,7 +169,7 @@ public class FirebaseProxy implements DatabaseInterface {
                         listener.onError(new IllegalArgumentException("...."));
                     }
                 } else {
-                    Log.e(TAG, "Attempt to get document snapshot for Attachment" +
+                    Log.e(TAG, "Attempt to get documentId snapshot for Attachment" +
                             attachment.getKey() +
                             " failed with", task.getException());
                     listener.onError(task.getException());
@@ -288,7 +288,7 @@ public class FirebaseProxy implements DatabaseInterface {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to add a new discussion to Document " + request.getDocumentId().getKey(), e);
+                Log.e(TAG, "Failed to add a new discussionId to Document " + request.getDocumentId().getKey(), e);
                 listener.onError(e);
             }
         });
@@ -331,7 +331,7 @@ public class FirebaseProxy implements DatabaseInterface {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.i(TAG, "New Comment was added to Discussion: ");
-                        getDiscussion(comment.getId().getDiscussion(), listener);
+                        getDiscussion(comment.getId().getDiscussionId(), listener);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -384,7 +384,7 @@ public class FirebaseProxy implements DatabaseInterface {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Log.i(TAG, "Successfully uploaded attachment to the storage");
-                DocumentReference docRef = Schema.attachments(db, request.getCommentId().getDiscussion())
+                DocumentReference docRef = Schema.attachments(db, request.getCommentId().getDiscussionId())
                         .document();
                 final FirebaseAttachment firebaseAttachment = new FirebaseAttachment();
                 firebaseAttachment.creationTimestamp = null;
@@ -412,7 +412,7 @@ public class FirebaseProxy implements DatabaseInterface {
                 }).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.i(TAG, "Loaded Attachment to the Discussion: " + request.getCommentId().getDiscussion().getKey());
+                        Log.i(TAG, "Loaded Attachment to the Discussion: " + request.getCommentId().getDiscussionId().getKey());
                         getAttachment(firebaseAttachment.getId(), listener);
                     }
                 });

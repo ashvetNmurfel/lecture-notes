@@ -65,7 +65,7 @@ public class Schema {
 
   @NonNull
   public static DocumentReference attachment(FirebaseFirestore db, @NotNull AttachmentId attachment) {
-      return attachments(db, attachment.getDiscussion())
+      return attachments(db, attachment.getDiscussionId())
               .document(attachment.getKey());
   }
 }

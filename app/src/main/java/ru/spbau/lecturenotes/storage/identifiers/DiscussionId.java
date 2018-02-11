@@ -5,24 +5,26 @@ import org.jetbrains.annotations.NotNull;
 import ru.spbau.lecturenotes.storage.DiscussionLocation;
 
 public class DiscussionId {
-    protected DocumentId document;
+    protected DocumentId documentId;
     protected String key;
     protected DiscussionLocation location;
 
-    public DiscussionId(DocumentId document, String key, DiscussionLocation location) {
-        this.document = document;
+    public DiscussionId(final @NotNull DocumentId documentId,
+                        final @NotNull String key,
+                        final @NotNull DiscussionLocation location) {
+        this.documentId = documentId;
         this.key = key;
         this.location = location;
     }
 
     @NotNull
     public GroupId getGroupId() {
-        return document.getGroupId();
+        return documentId.getGroupId();
     }
 
     @NotNull
     public DocumentId getDocumentId() {
-        return document;
+        return documentId;
     }
 
     @NotNull
