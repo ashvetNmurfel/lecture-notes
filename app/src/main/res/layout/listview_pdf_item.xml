@@ -2,44 +2,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:baselineAligned="false"
+    android:descendantFocusability="blocksDescendants">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/pdf_icon_layout"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/pdf_icon_layout"
-            android:layout_width="658dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/pdf_list_item_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Алгоритмы"
-                android:textSize="24sp" />
-
-            <TextView
-                android:id="@+id/pdf_list_item_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Копелиович"
-                android:textSize="18sp"
-                android:textStyle="normal" />
-        </LinearLayout>
-
-        <Switch
+        <TextView
+            android:id="@+id/pdf_list_item_name"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text=" " />
-    </LinearLayout>
+            android:text="Алгоритмы"
+            android:textSize="24sp" />
 
+        <TextView
+            android:id="@+id/pdf_list_item_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Копелиович"
+            android:textSize="18sp"
+            android:textStyle="normal" />
+    </LinearLayout>
 </LinearLayout>
