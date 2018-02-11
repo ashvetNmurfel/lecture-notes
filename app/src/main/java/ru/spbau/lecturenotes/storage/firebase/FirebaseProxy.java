@@ -29,23 +29,23 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 
+import ru.spbau.lecturenotes.storage.Attachment;
 import ru.spbau.lecturenotes.storage.DatabaseInterface;
+import ru.spbau.lecturenotes.storage.Discussion;
+import ru.spbau.lecturenotes.storage.DiscussionStatus;
+import ru.spbau.lecturenotes.storage.Document;
 import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.User;
+import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
+import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
+import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
+import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 import ru.spbau.lecturenotes.storage.requests.AddCommentRequest;
 import ru.spbau.lecturenotes.storage.requests.AttachmentSketch;
 import ru.spbau.lecturenotes.storage.requests.NewAttachmentRequest;
 import ru.spbau.lecturenotes.storage.requests.NewDiscussionRequest;
-import ru.spbau.lecturenotes.storage.Attachment;
-import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
-import ru.spbau.lecturenotes.storage.identifiers.CommentId;
-import ru.spbau.lecturenotes.storage.Discussion;
-import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
-import ru.spbau.lecturenotes.storage.DiscussionStatus;
-import ru.spbau.lecturenotes.storage.Document;
-import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
-import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 
 import static android.content.ContentValues.TAG;
 
@@ -71,7 +71,7 @@ public class FirebaseProxy implements DatabaseInterface {
                                 firebaseDocument, listener));
                     } else {
                         Log.w(TAG, "Error: could not find snapshot for Document: " + document.getKey());
-                        listener.onError(new IllegalArgumentException("...."));
+                        listener.onError(new IllegalArgumentException("Document " + document.getKey() + "wasn't found"));
                     }
                 } else {
                     Log.e(TAG, "Attempt to get documentId snapshot for Document " +
@@ -120,7 +120,7 @@ public class FirebaseProxy implements DatabaseInterface {
                                 new LoadCommentsListResultListener(documentSnapshot.toObject(FirebaseDiscussion.class), listener));
                     } else {
                         Log.w(TAG, "Error: could not find snapshot for Discussion: " + discussion.getKey());
-                        listener.onError(new IllegalArgumentException("...."));
+                        listener.onError(new IllegalArgumentException("Discussion " + discussion.getKey() + " wasn't found"));
                     }
                 } else {
                     Log.e(TAG, "Attempt to get documentId snapshot for Discussion " +
@@ -406,7 +406,6 @@ public class FirebaseProxy implements DatabaseInterface {
                                 Log.e(TAG, "Failed to delete Attachemnt from the storage", e);
                             }
                         });
-                        // todo: just log it ^
                         listener.onError(e);
                     }
                 }).addOnSuccessListener(new OnSuccessListener<Void>() {
