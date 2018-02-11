@@ -5,6 +5,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.Date;
 
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
+
 
 /**
  * Structure that will be returned to UI layer as a result of the comment request.

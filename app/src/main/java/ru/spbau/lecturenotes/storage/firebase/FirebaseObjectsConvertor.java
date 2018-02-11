@@ -6,9 +6,9 @@ import java.util.List;
 
 import ru.spbau.lecturenotes.storage.Attachment;
 import ru.spbau.lecturenotes.storage.AttachmentType;
-import ru.spbau.lecturenotes.storage.CommentId;
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.Discussion;
-import ru.spbau.lecturenotes.storage.DiscussionId;
+import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.DiscussionStatus;
 import ru.spbau.lecturenotes.storage.Document;
 

@@ -1,4 +1,4 @@
-package ru.spbau.lecturenotes.storage;
+package ru.spbau.lecturenotes.storage.identifiers;
 
 public class GroupId {
     protected String key;

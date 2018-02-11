@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.Date;
 
-import ru.spbau.lecturenotes.storage.DocumentId;
+import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 
 public class FirebaseDocument {
     protected DocumentId id;

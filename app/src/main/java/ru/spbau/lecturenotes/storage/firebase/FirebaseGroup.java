@@ -4,7 +4,7 @@ import com.google.firebase.firestore.ServerTimestamp;
 
 import java.sql.Date;
 
-import ru.spbau.lecturenotes.storage.GroupId;
+import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 
 public class FirebaseGroup {
     protected GroupId groupId;

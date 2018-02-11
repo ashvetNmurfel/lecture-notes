@@ -8,10 +8,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.jetbrains.annotations.NotNull;
 
-import ru.spbau.lecturenotes.storage.AttachmentId;
-import ru.spbau.lecturenotes.storage.DiscussionId;
-import ru.spbau.lecturenotes.storage.DocumentId;
-import ru.spbau.lecturenotes.storage.GroupId;
+import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
+import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
+import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
+import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 
 public class Schema {
   public static final String GROUPS = "groups";

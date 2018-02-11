@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.Date;
 
-import ru.spbau.lecturenotes.storage.CommentId;
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.User;
 
 public class FirebaseComment {

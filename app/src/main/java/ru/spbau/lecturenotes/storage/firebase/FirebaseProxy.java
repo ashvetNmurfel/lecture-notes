@@ -38,14 +38,14 @@ import ru.spbau.lecturenotes.storage.requests.AttachmentSketch;
 import ru.spbau.lecturenotes.storage.requests.NewAttachmentRequest;
 import ru.spbau.lecturenotes.storage.requests.NewDiscussionRequest;
 import ru.spbau.lecturenotes.storage.Attachment;
-import ru.spbau.lecturenotes.storage.AttachmentId;
-import ru.spbau.lecturenotes.storage.CommentId;
+import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.Discussion;
-import ru.spbau.lecturenotes.storage.DiscussionId;
+import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.DiscussionStatus;
 import ru.spbau.lecturenotes.storage.Document;
-import ru.spbau.lecturenotes.storage.DocumentId;
-import ru.spbau.lecturenotes.storage.GroupId;
+import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
+import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 
 import static android.content.ContentValues.TAG;
 

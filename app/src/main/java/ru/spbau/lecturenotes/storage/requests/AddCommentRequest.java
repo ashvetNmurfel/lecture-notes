@@ -2,7 +2,7 @@ package ru.spbau.lecturenotes.storage.requests;
 
 import org.jetbrains.annotations.NotNull;
 
-import ru.spbau.lecturenotes.storage.DiscussionId;
+import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 
 public class AddCommentRequest {
     protected DiscussionId discussionId;

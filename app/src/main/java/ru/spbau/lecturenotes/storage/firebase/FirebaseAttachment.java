@@ -5,7 +5,7 @@ import com.google.firebase.firestore.ServerTimestamp;
 import java.sql.Date;
 
 import ru.spbau.lecturenotes.storage.Attachment;
-import ru.spbau.lecturenotes.storage.AttachmentId;
+import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
 
 public class FirebaseAttachment {
     protected AttachmentId id;

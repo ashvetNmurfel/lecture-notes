@@ -2,6 +2,8 @@ package ru.spbau.lecturenotes.storage;
 
 import java.sql.Date;
 
+import ru.spbau.lecturenotes.storage.identifiers.GroupId;
+
 public class Group {
     protected GroupId id;
     protected Date timestamp;

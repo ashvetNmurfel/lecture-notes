@@ -3,6 +3,9 @@ package ru.spbau.lecturenotes.storage;
 import java.sql.Date;
 import java.util.List;
 
+import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
+import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
+
 /**
  * Structure that will be returned to UI layer as a result of the document request.
  */

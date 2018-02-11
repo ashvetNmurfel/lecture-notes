@@ -1,6 +1,6 @@
 package ru.spbau.lecturenotes.storage.requests;
 
-import ru.spbau.lecturenotes.storage.CommentId;
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 
 public class NewAttachmentRequest {
     protected CommentId commentId;

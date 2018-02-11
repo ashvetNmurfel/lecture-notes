@@ -6,6 +6,9 @@ import org.jetbrains.annotations.Nullable;
 import java.sql.Date;
 import java.util.List;
 
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
+import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
+
 
 /**
  * Structure that will be returned to UI layer as a result of the discussion request.

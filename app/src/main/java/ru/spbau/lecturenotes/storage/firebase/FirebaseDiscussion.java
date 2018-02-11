@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.Date;
 
-import ru.spbau.lecturenotes.storage.DiscussionId;
+import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 
 public class FirebaseDiscussion {
     protected DiscussionId id;

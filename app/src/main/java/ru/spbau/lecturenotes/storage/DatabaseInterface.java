@@ -1,8 +1,12 @@
 package ru.spbau.lecturenotes.storage;
 
-import java.util.EventListener;
 import java.util.List;
 
+import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
+import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
+import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
+import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 import ru.spbau.lecturenotes.storage.requests.AddCommentRequest;
 import ru.spbau.lecturenotes.storage.requests.NewAttachmentRequest;
 import ru.spbau.lecturenotes.storage.requests.NewDiscussionRequest;

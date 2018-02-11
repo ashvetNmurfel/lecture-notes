@@ -2,6 +2,8 @@ package ru.spbau.lecturenotes.storage;
 
 import java.sql.Date;
 
+import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
+
 /**
  * Structure that will be returned to UI layer as a result of the attachmentFile request.
  */

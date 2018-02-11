@@ -1,6 +1,8 @@
-package ru.spbau.lecturenotes.storage;
+package ru.spbau.lecturenotes.storage.identifiers;
 
 import org.jetbrains.annotations.NotNull;
+
+import ru.spbau.lecturenotes.storage.DiscussionLocation;
 
 public class DiscussionId {
     protected DocumentId document;
