@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1047742897537-kovau0225pmqmtd2eouckho47s8ps4gi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.spbau.lecturenotes",
+            "certificate_hash": "25edb17f63abca541599ed85c9c86be04d617942"
+          }
+        },
+        {
           "client_id": "1047742897537-d4kr9labk4hel1m112c1ua8vvou30vje.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
