@@ -9,6 +9,9 @@ public class DiscussionId {
     protected String key;
     protected DiscussionLocation location;
 
+    public DiscussionId() {
+    }
+
     public DiscussionId(final @NotNull DocumentId documentId,
                         final @NotNull String key,
                         final @NotNull DiscussionLocation location) {

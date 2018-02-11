@@ -6,6 +6,9 @@ public class AttachmentId {
     protected CommentId commentId;
     protected String key;
 
+    public AttachmentId() {
+    }
+
     public AttachmentId(final @NotNull CommentId commentId, final @NotNull String key) {
         this.commentId = commentId;
         this.key = key;

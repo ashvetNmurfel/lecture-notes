@@ -7,6 +7,9 @@ public class DocumentId {
     protected String key;
     protected String filename;
 
+    public DocumentId() {
+    }
+
     public DocumentId(@NotNull final GroupId groupId,
                       @NotNull final String key,
                       @NotNull final String filename) {

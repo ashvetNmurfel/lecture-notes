@@ -4,7 +4,7 @@ import com.google.firebase.firestore.ServerTimestamp;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Date;
+import java.util.Date;
 
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 

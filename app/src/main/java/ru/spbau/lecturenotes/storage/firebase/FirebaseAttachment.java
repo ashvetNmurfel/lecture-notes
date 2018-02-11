@@ -2,7 +2,7 @@ package ru.spbau.lecturenotes.storage.firebase;
 
 import com.google.firebase.firestore.ServerTimestamp;
 
-import java.sql.Date;
+import java.util.Date;
 
 import ru.spbau.lecturenotes.storage.Attachment;
 import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;

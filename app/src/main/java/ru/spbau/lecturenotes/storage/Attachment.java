@@ -1,6 +1,6 @@
 package ru.spbau.lecturenotes.storage;
 
-import java.sql.Date;
+import java.util.Date;
 
 import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
 

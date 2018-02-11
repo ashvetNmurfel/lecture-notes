@@ -3,7 +3,7 @@ package ru.spbau.lecturenotes.storage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 import ru.spbau.lecturenotes.storage.identifiers.CommentId;

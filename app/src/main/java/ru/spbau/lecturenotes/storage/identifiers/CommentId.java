@@ -12,6 +12,9 @@ public class CommentId {
         this.key = key;
     }
 
+    public CommentId() {
+    }
+
     @NotNull
     public DiscussionId getDiscussionId() {
         return discussionId;

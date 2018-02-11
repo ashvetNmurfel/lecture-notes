@@ -15,7 +15,7 @@ import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 
 public class Schema {
   public static final String GROUPS = "groups";
-  public static final String DOCS = "documents";
+  public static final String DOCS = "docs";
   public static final String DISCUSSIONS = "discussions";
   public static final String COMMENTS = "comments";
   public static final String ATTACHMENTS = "attachments";

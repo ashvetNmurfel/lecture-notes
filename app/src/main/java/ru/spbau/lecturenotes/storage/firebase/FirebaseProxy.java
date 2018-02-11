@@ -50,10 +50,14 @@ import ru.spbau.lecturenotes.storage.requests.NewDiscussionRequest;
 import static android.content.ContentValues.TAG;
 
 public class FirebaseProxy implements DatabaseInterface {
-    static FirebaseProxy INSTANCE = new FirebaseProxy();
+    protected static FirebaseProxy INSTANCE = new FirebaseProxy();
     protected FirebaseFirestore db = FirebaseFirestore.getInstance();
     protected FirebaseStorage storage = FirebaseStorage.getInstance();
     protected FirebaseAuth auth = FirebaseAuth.getInstance();
+
+    public static FirebaseProxy getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public void getDocument(final @NotNull DocumentId document, final ResultListener<Document> listener) {
