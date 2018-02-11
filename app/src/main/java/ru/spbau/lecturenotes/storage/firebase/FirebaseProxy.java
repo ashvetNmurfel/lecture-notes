@@ -12,6 +12,8 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -23,9 +25,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import ru.spbau.lecturenotes.storage.DatabaseInterface;
 import ru.spbau.lecturenotes.storage.ListenerController;
@@ -54,11 +56,7 @@ public class FirebaseProxy implements DatabaseInterface {
     @Override
     public void getDocument(final @NotNull DocumentId document, final ResultListener<Document> listener) {
         Log.i(TAG, "Attempting to get Document " + document.getKey());
-        final DocumentReference docRef = db
-                .collection(FirebaseCollections.GROUPS.str())
-                .document(document.getGroupId().getKey())
-                .collection(FirebaseCollections.DOCS.str())
-                .document(document.getKey());
+        final DocumentReference docRef = Schema.document(db, document);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -108,11 +106,7 @@ public class FirebaseProxy implements DatabaseInterface {
     @Override
     public void getDiscussion(final DiscussionId discussion, final @NotNull ResultListener<Discussion> listener) {
         Log.i(TAG, "Attempting to get Discussion" + discussion.getKey());
-        final DocumentReference docRef = db
-                .collection(FirebaseCollections.GROUPS.str())
-                .document(discussion.getDocumentId().getKey())
-                .collection(FirebaseCollections.DOCS.str())
-                .document(discussion.getKey());
+        final DocumentReference docRef = Schema.discussion(db, discussion);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -158,15 +152,7 @@ public class FirebaseProxy implements DatabaseInterface {
     @Override
     public void getAttachment(final AttachmentId attachment, final @NotNull ResultListener<Attachment> listener) {
         Log.i(TAG, "Attempting to get Attachment " + attachment.getKey());
-        final DocumentReference docRef = db
-                .collection(FirebaseCollections.GROUPS.str())
-                .document(attachment.getGroupId().getKey())
-                .collection(FirebaseCollections.DOCS.str())
-                .document(attachment.getDocumentId().getKey())
-                .collection(FirebaseCollections.DISCUSSIONS.str())
-                .document(attachment.getDiscussion().getKey())
-                .collection(FirebaseCollections.ATTACHMENTS.str())
-                .document(attachment.getKey());
+        final DocumentReference docRef = Schema.attachment(db, attachment);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -190,128 +176,91 @@ public class FirebaseProxy implements DatabaseInterface {
         });
     }
 
+    private static class LoadListListener<C, K> implements OnCompleteListener<QuerySnapshot> {
+        private Class<C> clazz;
+        private ResultListener<List<K>> listener;
+        private Function<C, K> mapper;
+
+        public LoadListListener(Class<C> clazz, ResultListener<List<K>> listener, Function<C, K> mapper) {
+            this.clazz = clazz;
+            this.listener = listener;
+            this.mapper = mapper;
+        }
+
+        @Override
+        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+            if (task.isSuccessful()) {
+                final List<K> result = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult()) {
+                    result.add(mapper.apply(document.toObject(clazz)));
+                }
+                listener.onResult(result);
+            } else {
+                listener.onError(task.getException());
+            }
+
+        }
+    }
+
     @Override
     public void getDocumentsList(final GroupId group, final ResultListener<List<DocumentId>> listener) {
         Log.i(TAG, "Attempting to get Document list for Group" + group.getKey());
-        final CollectionReference collRef = db
-                .collection(FirebaseCollections.GROUPS.str())
-                .document(group.getKey())
-                .collection(FirebaseCollections.DOCS.str());
-        collRef.orderBy("updateTimestamp").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    final List<DocumentId> result = new ArrayList<>();
-                    for (DocumentSnapshot document : task.getResult()) {
-                        Log.i(TAG, "Added snapshot for Document: " + document.getId()
-                                + " to the list of ids");
-                        result.add(document.toObject(FirebaseDocument.class).getId());
-                    }
-                    listener.onResult(result);
-                } else {
-                    listener.onError(task.getException());
+        final CollectionReference collRef = Schema.documents(db, group);
+        collRef.orderBy("updateTimestamp").get().addOnCompleteListener(
+            new LoadListListener<>(FirebaseDocument.class, listener, new Function<FirebaseDocument, DocumentId>() {
+                @Override
+                public DocumentId apply(FirebaseDocument firebaseDocument) {
+                    return firebaseDocument.getId();
                 }
-            }
-        });
+            }));
     }
 
     @Override
     public void getGroupsList(final @NotNull ResultListener<List<GroupId>> listener) {
         Log.i(TAG, "Attempting to get Group list");
-        final CollectionReference collRef = db
-                .collection(FirebaseCollections.GROUPS.str());
+        final CollectionReference collRef = Schema.groups(db);
         collRef
                 .whereEqualTo("permissions." + FirebaseAuth.getInstance().getUid(), true)
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    final List<GroupId> result = new ArrayList<>();
-                    for (DocumentSnapshot document : task.getResult()) {
-                        Log.i(TAG, "Added snapshot for Group: " + document.getId()
-                                + " to the list of ids");
-                        result.add(document.toObject(FirebaseGroup.class).getGroupId());
-                    }
-                    listener.onResult(result);
-                } else {
-                    Log.e(TAG, "Error getting list of groups", task.getException());
-                    listener.onError(task.getException());
+                .get().addOnCompleteListener(
+            new LoadListListener<>(FirebaseGroup.class, listener, new Function<FirebaseGroup, GroupId>() {
+                @Override
+                public GroupId apply(FirebaseGroup firebaseGroup) {
+                    return firebaseGroup.getGroupId();
                 }
-            }
-        });
+            }));
     }
 
     @Override
     public void getCommentsList(final DiscussionId discussionId, final @NotNull ResultListener<List<CommentId>> listener) {
         Log.i(TAG, "Attempting to get Comments list for Discussion " + discussionId.getKey());
-        final CollectionReference collRef = db
-                .collection(FirebaseCollections.GROUPS.str())
-                .document(discussionId.getGroupId().getKey())
-                .collection(FirebaseCollections.DOCS.str())
-                .document(discussionId.getDocumentId().getKey())
-                .collection(FirebaseCollections.DISCUSSIONS.str())
-                .document(discussionId.getKey())
-                .collection(FirebaseCollections.COMMENTS.str());
-        collRef.orderBy("creationTimestamp").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    final List<CommentId> result = new ArrayList<>();
-                    for (DocumentSnapshot document : task.getResult()) {
-                        Log.i(TAG, "Added snapshot for Comment: " + document.getId()
-                                + " to the list of ids");
-                        result.add(document.toObject(FirebaseComment.class).getId());
-                    }
-                    listener.onResult(result);
-                } else {
-                    Log.e(TAG, "Error getting Comments for Discussion: " + discussionId.getKey(),
-                            task.getException());
-                    listener.onError(task.getException());
+        final CollectionReference collRef = Schema.comments(db, discussionId);
+        collRef.orderBy("creationTimestamp").get().addOnCompleteListener(
+            new LoadListListener<>(FirebaseComment.class, listener, new Function<FirebaseComment, CommentId>() {
+                @Override
+                public CommentId apply(FirebaseComment firebaseComment) {
+                    return firebaseComment.getId();
                 }
-            }
-        });
+            }));
     }
 
     @Override
     public void getDiscussionsList(final DocumentId documentId, final ResultListener<List<DiscussionId>> listener) {
         Log.i(TAG, "Attempting to get Discussions list for Document" + documentId.getKey());
-        final CollectionReference collRef = db
-                .collection(FirebaseCollections.GROUPS.str())
-                .document(documentId.getGroupId().getKey())
-                .collection(FirebaseCollections.DOCS.str())
-                .document(documentId.getKey())
-                .collection(FirebaseCollections.DISCUSSIONS.str());
+        final CollectionReference collRef = Schema.discussions(db, documentId);
 
-        collRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<DiscussionId> result = new ArrayList<>();
-                    for (DocumentSnapshot document : task.getResult()) {
-                        Log.i(TAG, "Added snapshot for Disscussion: " + document.getId()
-                                + " to the list of ids");
-                        result.add(document.toObject(FirebaseDiscussion.class).getId());
-                    }
-                    listener.onResult(result);
-                } else {
-                    Log.e(TAG, "Error getting Discussion for : " + documentId.getKey(),
-                            task.getException());
-                    listener.onError(task.getException());
+        collRef.get().addOnCompleteListener(
+            new LoadListListener<>(FirebaseDiscussion.class, listener, new Function<FirebaseDiscussion, DiscussionId>() {
+                @Override
+                public DiscussionId apply(FirebaseDiscussion firebaseDiscussion) {
+                    return firebaseDiscussion.getId();
                 }
-            }
-        });
+            }));
     }
 
     @Override
     public void addDiscussion(final NewDiscussionRequest request, final ResultListener<Discussion> listener) {
         Log.i(TAG, "Attempting to add Discussion to the Document " + request.getDocumentId().getKey());
-        final DocumentReference docRef = db
-                .collection(FirebaseCollections.GROUPS.str())
-                .document(request.getDocumentId().getGroupId().getKey())
-                .collection(FirebaseCollections.DOCS.str())
-                .document(request.getDocumentId().getKey())
-                .collection(FirebaseCollections.COMMENTS.str())
-                .document();
+        final DocumentReference docRef = Schema.discussions(db, request.getDocumentId()).document();
         final FirebaseDiscussion discussion = new FirebaseDiscussion();
         discussion.id = new DiscussionId(request.getDocumentId(), docRef.getId(), request.getDiscussion().getLocation());
         discussion.status = DiscussionStatus.UNKNOWN.toString();
@@ -346,14 +295,7 @@ public class FirebaseProxy implements DatabaseInterface {
     @Override
     public void addComment(final AddCommentRequest request, ResultListener<Discussion> listener) {
         Log.i(TAG, "Attempting to add Comment to the Discussion" + request.getDiscussionId().getKey());
-        DocumentReference docRef = db
-                .collection(FirebaseCollections.GROUPS.str())
-                .document(request.getDiscussionId().getGroupId().getKey())
-                .collection(FirebaseCollections.DOCS.str())
-                .document(request.getDiscussionId().getDocumentId().getKey())
-                .collection(FirebaseCollections.DISCUSSIONS.str())
-                .document(request.getDiscussionId().getKey())
-                .collection(FirebaseCollections.COMMENTS.str())
+        DocumentReference docRef = Schema.comments(db, request.getDiscussionId())
                 .document();
 
 
@@ -440,14 +382,7 @@ public class FirebaseProxy implements DatabaseInterface {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Log.i(TAG, "Successfully uploaded attachment to the storage");
-                DocumentReference docRef = db
-                        .collection(FirebaseCollections.GROUPS.str())
-                        .document(request.getCommentId().getGroupId().getKey())
-                        .collection(FirebaseCollections.DOCS.str())
-                        .document(request.getCommentId().getDocumentId().getKey())
-                        .collection(FirebaseCollections.DISCUSSIONS.str())
-                        .document(request.getCommentId().getDiscussion().getKey())
-                        .collection(FirebaseCollections.ATTACHMENTS.str())
+                DocumentReference docRef = Schema.attachments(db, request.getCommentId().getDiscussion())
                         .document();
                 final FirebaseAttachment firebaseAttachment = new FirebaseAttachment();
                 firebaseAttachment.creationTimestamp = null;
@@ -458,7 +393,17 @@ public class FirebaseProxy implements DatabaseInterface {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.e(TAG, "Failed to add Attachment for the path: " + request.getAttachment().getPath(), e);
-                        attachmentReference.delete();
+                        attachmentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.i(TAG, "Attachment was successfully deleted from the storage");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG, "Failed to delete Attachemnt from the storage", e);
+                            }
+                        });
                         // todo: just log it ^
                         listener.onError(e);
                     }
@@ -474,22 +419,57 @@ public class FirebaseProxy implements DatabaseInterface {
     }
 
     @Override
-    public ListenerController setDocumentListListener(EventListener listener, GroupId group) {
-        return null;
+    public ListenerController setDocumentListListener(final @NotNull GroupId group,
+                                                      final @NotNull DocumentListChangeListener listener) {
+        CollectionReference collection = Schema.documents(db, group);
+        ListenerRegistration registration = collection.addSnapshotListener(new com.google.firebase.firestore.EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                listener.onDocumentListUpdated(group);
+            }
+        });
+        return new FirebaseListenerController(registration);
     }
 
     @Override
-    public ListenerController setGroupsListListener(EventListener listener) {
-        return null;
+    public ListenerController setGroupsListListener(final @NotNull GroupListChangeListener listener) {
+        CollectionReference collection = Schema.groups(db);
+        ListenerRegistration registration = collection
+                .whereEqualTo("permissions." + FirebaseAuth.getInstance().getUid(), true)
+                .addSnapshotListener(new com.google.firebase.firestore.EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                        listener.onGroupListUpdated();
+                    }
+        });
+        return new FirebaseListenerController(registration);
     }
 
     @Override
-    public ListenerController setDocumentListener(DocumentId document, EventListener listener) {
-        return null;
+    public ListenerController setDiscussionsListListener(final @NotNull DocumentId document,
+                                                         final @NotNull DiscussionListListener listener) {
+        CollectionReference collection = Schema.discussions(db, document);
+        ListenerRegistration registration = collection
+                .addSnapshotListener(new com.google.firebase.firestore.EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                        listener.onDiscussionListUpdated(document);
+                    }
+                });
+        return new FirebaseListenerController(registration);
     }
 
     @Override
-    public ListenerController setDiscussionListener(DiscussionId discussion, EventListener listener) {
-        return null;
+    public ListenerController setCommentsListListener(final @NotNull DiscussionId discussion,
+                                                      final @NotNull CommentListListener listener) {
+        CollectionReference collection = Schema.comments(db, discussion);
+        ListenerRegistration registration = collection
+                .addSnapshotListener(new com.google.firebase.firestore.EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                        listener.onCommentsListUpdated(discussion);
+                    }
+                });
+        return new FirebaseListenerController(registration);
     }
 }

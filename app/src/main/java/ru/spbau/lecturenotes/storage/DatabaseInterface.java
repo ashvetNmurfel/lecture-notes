@@ -29,12 +29,28 @@ public interface DatabaseInterface {
 
     void addAttachment(NewAttachmentRequest request, ResultListener<Attachment> listener);
 
-    ListenerController setDocumentListListener(EventListener listener, GroupId group);
+    ListenerController setDocumentListListener(GroupId group, DocumentListChangeListener listener);
 
-    ListenerController setGroupsListListener(EventListener listener);
+    ListenerController setGroupsListListener(GroupListChangeListener listener);
 
-    ListenerController setDocumentListener(DocumentId document, EventListener listener);
+    public ListenerController setDiscussionsListListener(DocumentId document, DiscussionListListener listener);
 
-    ListenerController setDiscussionListener(DiscussionId discussion, EventListener listener);
+    public ListenerController setCommentsListListener(DiscussionId discussion, CommentListListener listener);
+
+    interface DocumentListChangeListener {
+        void onDocumentListUpdated(GroupId id);
+    }
+
+    interface GroupListChangeListener {
+        void onGroupListUpdated();
+    }
+
+    interface DiscussionListListener {
+        void onDiscussionListUpdated(DocumentId document);
+    }
+
+    interface CommentListListener {
+        void onCommentsListUpdated(DiscussionId discussion);
+    }
 }
 
