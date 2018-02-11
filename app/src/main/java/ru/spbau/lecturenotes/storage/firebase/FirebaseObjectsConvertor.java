@@ -6,6 +6,8 @@ import java.util.List;
 
 import ru.spbau.lecturenotes.storage.Attachment;
 import ru.spbau.lecturenotes.storage.AttachmentType;
+import ru.spbau.lecturenotes.storage.DocumentDataReference;
+import ru.spbau.lecturenotes.storage.DocumentDataType;
 import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.Discussion;
 import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
@@ -17,8 +19,15 @@ public class FirebaseObjectsConvertor {
                                       @NotNull final List<DiscussionId> discussions) {
         return new Document(fdoc.getId(),
                 discussions,
-                fdoc.getStorageReference(),
+                toDocumentDataReference(fdoc.getReference()),
                 fdoc.getUpdateTimestamp());
+    }
+
+    private static DocumentDataReference toDocumentDataReference(FirebaseDocumentDataReference reference) {
+        return new DocumentDataReference(
+                reference.numberOfPages,
+                DocumentDataType.valueOf(reference.type),
+                reference.storageReference);
     }
 
     public static Discussion toDiscussion(@NotNull final FirebaseDiscussion fdiscussion,

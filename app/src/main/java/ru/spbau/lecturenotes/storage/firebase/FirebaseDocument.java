@@ -10,7 +10,7 @@ import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 
 public class FirebaseDocument {
     protected DocumentId id;
-    protected String storageReference;
+    protected FirebaseDocumentDataReference reference;
     @ServerTimestamp
     protected Date updateTimestamp;
 
@@ -23,8 +23,8 @@ public class FirebaseDocument {
     }
 
     @NotNull
-    public String getStorageReference() {
-        return storageReference;
+    public FirebaseDocumentDataReference getReference() {
+        return reference;
     }
 
     @NotNull

@@ -12,10 +12,10 @@ import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 public class Document {
     protected DocumentId id;
     protected List<DiscussionId> discussions;
-    protected String reference;
+    protected DocumentDataReference reference;
     protected Date updateTimestamp;
 
-    public Document(DocumentId id, List<DiscussionId> discussions, String reference, Date updateTimestamp) {
+    public Document(DocumentId id, List<DiscussionId> discussions, DocumentDataReference  reference, Date updateTimestamp) {
         this.id = id;
         this.discussions = discussions;
         this.reference = reference;
@@ -30,7 +30,7 @@ public class Document {
         return discussions;
     }
 
-    public String getReference() {
+    public DocumentDataReference getReference() {
         return reference;
     }
 
