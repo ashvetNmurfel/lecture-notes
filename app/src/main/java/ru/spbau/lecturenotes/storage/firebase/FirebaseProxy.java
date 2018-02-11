@@ -386,7 +386,7 @@ public class FirebaseProxy implements DatabaseInterface {
                         .document();
                 final FirebaseAttachment firebaseAttachment = new FirebaseAttachment();
                 firebaseAttachment.creationTimestamp = null;
-                firebaseAttachment.type = null;
+                firebaseAttachment.type = request.getAttachment().getAttachmentType().toString();
                 firebaseAttachment.id = new AttachmentId(request.getCommentId(), docRef.getId());
                 firebaseAttachment.storageReference = attachmentPath;
                 docRef.set(firebaseAttachment).addOnFailureListener(new OnFailureListener() {
