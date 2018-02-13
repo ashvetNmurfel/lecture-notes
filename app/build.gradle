@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion "27.0.1"
     defaultConfig {
         applicationId "ru.spbau.lecturenotes"
@@ -25,9 +25,9 @@ dependencies {
     compile 'com.google.firebase:firebase-firestore:11.8.0'
     compile 'com.google.firebase:firebase-storage:11.8.0'
     compile 'com.google.firebase:firebase-auth:11.8.0'
+    compile 'com.firebaseui:firebase-ui-auth:3.2.1'
     compile 'com.google.firebase:firebase-messaging:11.8.0'
     compile 'com.google.firebase:firebase-database:11.8.0'
-    compile project(':android-pdf-viewer')
     provided 'org.androidannotations:androidannotations:4.0.0'
     compile 'org.androidannotations:androidannotations-api:4.0.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -38,7 +38,6 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'org.jetbrains:annotations-java5:15.0'
     compile 'org.jetbrains:annotations-java5:15.0'
 }
 

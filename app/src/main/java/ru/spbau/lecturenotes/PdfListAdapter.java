@@ -64,11 +64,11 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
         Intent intent;
         if (storage.isDirectory()) {
             intent = MainMenuActivity.createIntentForNode(this.context, storage.getName());
+            this.context.startActivity(intent);
         } else {
-            intent = PDFActivity.createIntentForFile(this.context, storage.getFile());
+            //intent = PDFActivity.createIntentForFile(this.context, storage.getFile());
             Toast.makeText(context, storage.getFile(), Toast.LENGTH_LONG).show();
         }
-        this.context.startActivity(intent);
     }
 
 
