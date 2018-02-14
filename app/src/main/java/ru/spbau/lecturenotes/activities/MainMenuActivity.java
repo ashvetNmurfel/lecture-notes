@@ -1,5 +1,6 @@
 package ru.spbau.lecturenotes.activities;
 
+import android.arch.core.util.Function;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,10 +10,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,18 +30,17 @@ import ru.spbau.lecturenotes.PdfListAdapter;
 import ru.spbau.lecturenotes.R;
 import ru.spbau.lecturenotes.controllers.MainMenuController;
 import ru.spbau.lecturenotes.data.PdfFileStorage;
-import ru.spbau.lecturenotes.services.ServicesInitializer;
-import ru.spbau.lecturenotes.services.UserInfoService;
-import ru.spbau.lecturenotes.storage.Group;
-import ru.spbau.lecturenotes.storage.ResultListener;
+import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.UserInfo;
 import ru.spbau.lecturenotes.storage.firebase.FirebaseProxy;
 import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 
 public class MainMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    protected ListenerController listenerController;
     private static final int RC_SIGN_IN = 123;
     public static final String KEY_NODE_ID = "nodeId";
+    private static final String TAG = "MainMenuActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,15 +49,6 @@ public class MainMenuActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("Select Group");
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -70,43 +60,86 @@ public class MainMenuActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ServicesInitializer.initializeAll();
-        startAuthorisation();
-
+        MainMenuController.initialize(FirebaseProxy.getInstance());
+        if (MainMenuController.getUserInfo() == null) {
+            startAuthorisation();
+        }
     }
 
-    protected void afterAuth () {
-        FirebaseProxy.getInstance().getGroupsList(new ResultListener<List<GroupId>>() {
-            @Override
-            public void onResult(List<GroupId> result) {
-                for (GroupId group : result) {
-                    if (group == null)
 
-                        Toast.makeText(getApplicationContext(), "Found group:" , Toast.LENGTH_LONG).show();
-                }
-                showGroups(result);
+    @Override
+    protected void onResume() {
+        setGroupListener();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        unsubscribeFromGroupListChanges();
+        super.onPause();
+    }
+
+    protected void signOut() {
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        unsubscribeFromGroupListChanges();
+                        startAuthorisation();
+                    }
+                });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+            if (resultCode == RESULT_OK) {
+                // Successfully signed in
+                showUserInfo();
+                setGroupListener();
+            } else {
+                startAuthorisation();
             }
+        }
+    }
+
+    private void setGroupListener() {
+        listenerController = MainMenuController.applyWhenGroupListChanges(new Function<List<GroupId>, Void>() {
             @Override
-            public void onError(Throwable error) {
-                FirebaseProxy.getInstance().getGroupsList(this);
+            public Void apply(List<GroupId> groupIds) {
+                showGroups(groupIds);
+                return null;
             }
         });
     }
 
-    protected void showGroups(List<GroupId> groups) {
-        ArrayList<PdfFileStorage> sectionsList = new ArrayList<>();
-        for (GroupId group : groups) {
-            sectionsList.add(PdfFileStorage.createDirectory(group.getName(), "", new ArrayList<PdfFileStorage>()));
-        }
-
-
-        Bundle extras =  getIntent().getExtras();
-        if (extras == null || extras.getString(KEY_NODE_ID) == null) {
-            //sectionsList = MainMenuController.INSTANCE.getRootDirectory().substorages();
+    private void unsubscribeFromGroupListChanges() {
+        if (listenerController == null) {
+            Log.w(TAG, "Attempting to unsubscribe with an empty listener");
         } else {
-            //sectionsList = MainMenuController.INSTANCE.getDir(extras.getString(KEY_NODE_ID)).substorages();
+            listenerController.stopListener();
         }
-        PdfListAdapter adapter = new PdfListAdapter(this, sectionsList);
+    }
+
+    private void showUserInfo() {
+        UserInfo currentUser = MainMenuController.getUserInfo();
+
+        TextView name = (TextView) findViewById(R.id.userName);
+        TextView email = (TextView) findViewById(R.id.userEmail);
+        name.setText(currentUser.getName());
+        email.setText(currentUser.getEmail());
+    }
+
+
+    protected void showGroups(List<GroupId> groups) {
+        ArrayList<PdfFileStorage> listItems = new ArrayList<>();
+        for (GroupId group : groups) {
+            listItems.add(PdfFileStorage.createDirectory(group.getName(), "", new ArrayList<PdfFileStorage>()));
+        }
+
+        PdfListAdapter adapter = new PdfListAdapter(this, listItems);
         ListView pdfList = (ListView) findViewById(R.id.pdf_list);
         pdfList.setAdapter(adapter);
     }
@@ -121,36 +154,6 @@ public class MainMenuActivity extends AppCompatActivity
                 RC_SIGN_IN);
     }
 
-    protected void signOut() {
-        AuthUI.getInstance()
-                .signOut(this)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    public void onComplete(@NonNull Task<Void> task) {
-                        startAuthorisation();
-                    }
-                });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            if (resultCode == RESULT_OK) {
-                // Successfully signed in
-                UserInfo currentUser = UserInfoService.getUserInfo();
-
-                TextView name = (TextView) findViewById(R.id.userName);
-                TextView email = (TextView) findViewById(R.id.userEmail);
-                name.setText(currentUser.getName());
-                email.setText(currentUser.getEmail());
-                afterAuth();
-            } else {
-                startAuthorisation();
-            }
-        }
-    }
 
     @Override
     public void onBackPressed() {
@@ -192,7 +195,7 @@ public class MainMenuActivity extends AppCompatActivity
 
         if (id == R.id.nav_sign_out) {
             signOut();
-            Toast.makeText(getApplicationContext(), "To use application, you should be signed in", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "To use this application further, you should be signed in", Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_settings) {
             Toast.makeText(getApplicationContext(), "Cool! I also love settings!", Toast.LENGTH_LONG).show();
         }
