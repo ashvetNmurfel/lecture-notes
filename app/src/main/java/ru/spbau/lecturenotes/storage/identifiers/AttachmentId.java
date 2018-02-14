@@ -2,7 +2,9 @@ package ru.spbau.lecturenotes.storage.identifiers;
 
 import org.jetbrains.annotations.NotNull;
 
-public class AttachmentId {
+import java.io.Serializable;
+
+public class AttachmentId implements Serializable {
     protected CommentId commentId;
     protected String key;
 

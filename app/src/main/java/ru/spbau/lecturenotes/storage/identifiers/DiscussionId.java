@@ -2,9 +2,11 @@ package ru.spbau.lecturenotes.storage.identifiers;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
+
 import ru.spbau.lecturenotes.storage.DiscussionLocation;
 
-public class DiscussionId {
+public class DiscussionId implements Serializable {
     protected DocumentId documentId;
     protected String key;
     protected DiscussionLocation location;
