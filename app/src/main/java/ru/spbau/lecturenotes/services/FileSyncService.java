@@ -1,8 +1,12 @@
 package ru.spbau.lecturenotes.services;
 
-/**
- * Created by annikura on 2/14/18.
- */
+import ru.spbau.lecturenotes.storage.DatabaseInterface;
 
 public class FileSyncService {
+    protected DatabaseInterface db;
+
+    public FileSyncService(DatabaseInterface db) {
+        this.db = db;
+    }
+
 }
