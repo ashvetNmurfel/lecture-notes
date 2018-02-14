@@ -20,7 +20,7 @@ public class PdfFileStorage implements Serializable {
         return new PdfFileStorage(true, name, info, null, substorages);
     }
 
-    private PdfFileStorage(boolean isDirectory, String name, String info, String file, ArrayList<PdfFileStorage> substorages) {
+    public PdfFileStorage(boolean isDirectory, String name, String info, String file, ArrayList<PdfFileStorage> substorages) {
         this.isDirectory = isDirectory;
         this.substorages = substorages;
         this.file = file;

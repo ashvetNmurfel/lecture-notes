@@ -37,6 +37,7 @@ import ru.spbau.lecturenotes.storage.Document;
 import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.User;
+import ru.spbau.lecturenotes.storage.UserInfo;
 import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
 import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
@@ -231,7 +232,7 @@ public class FirebaseProxy implements DatabaseInterface {
             new LoadListListener<>(FirebaseGroup.class, listener, new Function<FirebaseGroup, GroupId>() {
                 @Override
                 public GroupId apply(FirebaseGroup firebaseGroup) {
-                    return firebaseGroup.getGroupId();
+                    return firebaseGroup.getId();
                 }
             }));
     }
@@ -258,6 +259,7 @@ public class FirebaseProxy implements DatabaseInterface {
             new LoadListListener<>(FirebaseDiscussion.class, listener, new Function<FirebaseDiscussion, DiscussionId>() {
                 @Override
                 public DiscussionId apply(FirebaseDiscussion firebaseDiscussion) {
+
                     return firebaseDiscussion.getId();
                 }
             }));
@@ -476,5 +478,16 @@ public class FirebaseProxy implements DatabaseInterface {
                     }
                 });
         return new FirebaseListenerController(registration);
+    }
+
+    @Override
+    public UserInfo getUserInfo() {
+        if (auth.getCurrentUser() == null) {
+            return null;
+        }
+        return new UserInfo(
+                auth.getUid(),
+                auth.getCurrentUser().getDisplayName(),
+                auth.getCurrentUser().getEmail());
     }
 }

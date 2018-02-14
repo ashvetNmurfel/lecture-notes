@@ -41,6 +41,8 @@ public interface DatabaseInterface {
 
     public ListenerController setCommentsListListener(DiscussionId discussion, CommentListListener listener);
 
+    public UserInfo getUserInfo();
+
     interface DocumentListChangeListener {
         void onDocumentListUpdated(GroupId id);
     }
