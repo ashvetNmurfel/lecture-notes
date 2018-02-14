@@ -67,7 +67,7 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
             //this.context.startActivity(intent);
         } else {
             //intent = PDFActivity.createIntentForFile(this.context, storage.getFile());
-            Toast.makeText(context, storage.getFile(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, storage.getDocument().getKey(), Toast.LENGTH_LONG).show();
         }
     }
 
