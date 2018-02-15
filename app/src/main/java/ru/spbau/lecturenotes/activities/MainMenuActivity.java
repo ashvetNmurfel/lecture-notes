@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import ru.spbau.lecturenotes.PdfListAdapter;
+import ru.spbau.lecturenotes.uiElements.GroupListAdapter;
+import ru.spbau.lecturenotes.uiElements.PdfListAdapter;
 import ru.spbau.lecturenotes.R;
 import ru.spbau.lecturenotes.controllers.MainMenuController;
 import ru.spbau.lecturenotes.data.PdfFileStorage;
@@ -135,14 +136,9 @@ public class MainMenuActivity extends AppCompatActivity
 
 
     protected void showGroups(List<GroupId> groups) {
-        ArrayList<PdfFileStorage> listItems = new ArrayList<>();
-        for (GroupId group : groups) {
-            listItems.add(PdfFileStorage.createDirectory(group.getName(), "", new ArrayList<PdfFileStorage>()));
-        }
-
-        PdfListAdapter adapter = new PdfListAdapter(this, listItems);
-        ListView pdfList = (ListView) findViewById(R.id.pdf_list);
-        pdfList.setAdapter(adapter);
+        GroupListAdapter adapter = new GroupListAdapter(this, groups);
+        ListView gropsList = (ListView) findViewById(R.id.groups_list);
+        gropsList.setAdapter(adapter);
     }
 
     protected void startAuthorisation() {

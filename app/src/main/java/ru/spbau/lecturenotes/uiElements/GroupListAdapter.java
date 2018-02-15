@@ -1,4 +1,4 @@
-package ru.spbau.lecturenotes;
+package ru.spbau.lecturenotes.uiElements;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,19 +6,20 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
+import ru.spbau.lecturenotes.R;
 import ru.spbau.lecturenotes.data.PdfFileStorage;
+import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 
-public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
+public class GroupListAdapter extends ArrayAdapter<GroupId> {
     private final Activity context;
-    private final ArrayList<PdfFileStorage> pdfs;
+    private final List<GroupId> groups;
 
     @Override
     public boolean areAllItemsEnabled()
@@ -32,10 +33,10 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
         return true;
     }
 
-    public PdfListAdapter(Activity context, ArrayList<PdfFileStorage> pdfs) {
-        super(context, R.layout.listview_pdf_item, pdfs);
+    public GroupListAdapter(Activity context, List<GroupId> groups) {
+        super(context, R.layout.listview_pdf_item, groups);
         this.context = context;
-        this.pdfs = pdfs;
+        this.groups = groups;
     }
 
     @Override
@@ -53,21 +54,21 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
             holder = (Holder)view.getTag();
         }
 
-        holder.storage = pdfs.get(position);
-        holder.nameTextField.setText(holder.storage.getName());
-        holder.infoTextField.setText(holder.storage.getInfo());
+        holder.group = groups.get(position);
+        holder.nameTextField.setText(holder.group.getName());
+        holder.infoTextField.setText(holder.group.getKey());
 
         return view;
     }
 
-    private void onItemClicked(Context context, PdfFileStorage storage) {
+    private void onItemClicked(Context context, GroupId group) {
         Intent intent;
-        if (storage.isDirectory()) {
+        if (false) {
             //intent = MainMenuActivity.createIntentForNode(this.context, storage.getName());
             //this.context.startActivity(intent);
         } else {
             //intent = PDFActivity.createIntentForFile(this.context, storage.getFile());
-            Toast.makeText(context, storage.getDocument().getKey(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, group.getName(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -75,11 +76,11 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
     private class Holder implements View.OnClickListener {
         private TextView nameTextField;
         private TextView infoTextField;
-        private PdfFileStorage storage;
+        private GroupId group;
 
         @Override
         public void onClick(View view) {
-            PdfListAdapter.this.onItemClicked(view.getContext(), storage);
+            GroupListAdapter.this.onItemClicked(view.getContext(), group);
         }
     }
 }
