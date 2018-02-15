@@ -68,15 +68,15 @@ public class MainMenuActivity extends AppCompatActivity
 
 
     @Override
-    protected void onResume() {
+    protected void onStart() {
         setGroupListener();
-        super.onResume();
+        super.onStart();
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         unsubscribeFromGroupListChanges();
-        super.onPause();
+        super.onStop();
     }
 
     protected void signOut() {
@@ -85,6 +85,7 @@ public class MainMenuActivity extends AppCompatActivity
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
                         unsubscribeFromGroupListChanges();
+                        showGroups(new ArrayList<GroupId>()); // cleaning list
                         startAuthorisation();
                     }
                 });
