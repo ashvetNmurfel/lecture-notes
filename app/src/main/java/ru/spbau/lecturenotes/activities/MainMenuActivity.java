@@ -72,6 +72,7 @@ public class MainMenuActivity extends AppCompatActivity
 
     @Override
     protected void onStart() {
+        spinner.setVisibility(View.VISIBLE);
         setGroupListener();
         super.onStart();
     }
@@ -79,7 +80,12 @@ public class MainMenuActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         unsubscribeFromGroupListChanges();
+        clearList();
         super.onStop();
+    }
+
+    protected void clearList() {
+        showGroups(new ArrayList<GroupId>());
     }
 
     protected void signOut() {
@@ -88,7 +94,7 @@ public class MainMenuActivity extends AppCompatActivity
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
                         unsubscribeFromGroupListChanges();
-                        showGroups(new ArrayList<GroupId>()); // cleaning list
+                        clearList();
                         startAuthorisation();
                     }
                 });
