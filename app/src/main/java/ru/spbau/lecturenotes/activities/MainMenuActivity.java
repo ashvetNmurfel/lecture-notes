@@ -13,7 +13,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,19 +28,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import ru.spbau.lecturenotes.uiElements.GroupListAdapter;
-import ru.spbau.lecturenotes.uiElements.PdfListAdapter;
 import ru.spbau.lecturenotes.R;
 import ru.spbau.lecturenotes.controllers.MainMenuController;
-import ru.spbau.lecturenotes.data.PdfFileStorage;
 import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.UserInfo;
 import ru.spbau.lecturenotes.storage.firebase.FirebaseProxy;
 import ru.spbau.lecturenotes.storage.identifiers.GroupId;
+import ru.spbau.lecturenotes.uiElements.GroupListAdapter;
 
 public class MainMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     protected ListenerController listenerController;
+    protected ProgressBar spinner;
     private static final int RC_SIGN_IN = 123;
     public static final String KEY_NODE_ID = "nodeId";
     private static final String TAG = "MainMenuActivity";
@@ -57,6 +58,7 @@ public class MainMenuActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        spinner = findViewById(R.id.groups_spinner);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -100,6 +102,7 @@ public class MainMenuActivity extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
                 showUserInfo();
+                spinner.setVisibility(View.VISIBLE);
                 setGroupListener();
             } else {
                 startAuthorisation();
@@ -108,9 +111,14 @@ public class MainMenuActivity extends AppCompatActivity
     }
 
     private void setGroupListener() {
+        if (listenerController != null) {
+            Log.w(TAG, "Trying to set listener while it's still active. Denied");
+            return;
+        }
         listenerController = MainMenuController.applyWhenGroupListChanges(new Function<List<GroupId>, Void>() {
             @Override
             public Void apply(List<GroupId> groupIds) {
+                spinner.setVisibility(View.GONE);
                 showGroups(groupIds);
                 return null;
             }
@@ -123,6 +131,7 @@ public class MainMenuActivity extends AppCompatActivity
         } else {
             listenerController.stopListener();
         }
+        listenerController = null;
     }
 
     private void showUserInfo() {
@@ -192,9 +201,13 @@ public class MainMenuActivity extends AppCompatActivity
 
         if (id == R.id.nav_sign_out) {
             signOut();
-            Toast.makeText(getApplicationContext(), "To use this application further, you should be signed in", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),
+                    "To use this application further, you should be signed in",
+                    Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_settings) {
-            Toast.makeText(getApplicationContext(), "Cool! I also love settings!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),
+                    "Cool! I also love settings!",
+                    Toast.LENGTH_LONG).show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
