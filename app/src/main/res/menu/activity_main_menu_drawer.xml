@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+tools:showIn="navigation_view">
+
+<item android:title="Authorisation">
+    <menu>
+        <item
+            android:id="@+id/nav_si"
+            android:icon="@drawable/ic_arrow_forward_black_24dp"
+            android:title="Sign in" />
+    </menu>
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_sign_out"
+            android:title="Sign out" />
+        <item
+            android:id="@+id/nav_settings"
+            android:title="Settings" />
+    </group>
+
+</item>
+
+</menu>
+

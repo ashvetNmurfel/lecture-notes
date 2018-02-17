@@ -1,4 +1,4 @@
-package ru.spbau.lecturenotes;
+package ru.spbau.lecturenotes.uiElements;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,14 +6,13 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
+import ru.spbau.lecturenotes.R;
 import ru.spbau.lecturenotes.data.PdfFileStorage;
 
 public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
@@ -63,12 +62,12 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
     private void onItemClicked(Context context, PdfFileStorage storage) {
         Intent intent;
         if (storage.isDirectory()) {
-            intent = MainMenuActivity.createIntentForNode(this.context, storage.getName());
+            //intent = MainMenuActivity.createIntentForNode(this.context, storage.getName());
+            //this.context.startActivity(intent);
         } else {
-            intent = PDFActivity.createIntentForFile(this.context, storage.getFile());
-            Toast.makeText(context, storage.getFile(), Toast.LENGTH_LONG).show();
+            //intent = PDFActivity.createIntentForFile(this.context, storage.getFile());
+            Toast.makeText(context, storage.getDocument().getKey(), Toast.LENGTH_LONG).show();
         }
-        this.context.startActivity(intent);
     }
 
 

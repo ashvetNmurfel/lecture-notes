@@ -2,7 +2,9 @@ package ru.spbau.lecturenotes.storage.identifiers;
 
 import org.jetbrains.annotations.NotNull;
 
-public class CommentId {
+import java.io.Serializable;
+
+public class CommentId implements Serializable {
     protected DiscussionId discussionId;
     protected String key;
 

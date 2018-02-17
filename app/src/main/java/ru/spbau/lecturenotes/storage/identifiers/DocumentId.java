@@ -2,7 +2,9 @@ package ru.spbau.lecturenotes.storage.identifiers;
 
 import org.jetbrains.annotations.NotNull;
 
-public class DocumentId {
+import java.io.Serializable;
+
+public class DocumentId implements Serializable {
     protected GroupId groupId;
     protected String key;
     protected String filename;
