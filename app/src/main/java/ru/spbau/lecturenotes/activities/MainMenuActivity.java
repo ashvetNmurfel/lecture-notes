@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -38,33 +37,45 @@ import ru.spbau.lecturenotes.uiElements.GroupListAdapter;
 
 public class MainMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    protected ListenerController groupsListener;
-    protected ProgressBar spinner;
-
-    protected ListView groupsList;
-    private static final int RC_SIGN_IN = 123;
-    public static final String KEY_NODE_ID = "nodeId";
     private static final String TAG = "MainMenuActivity";
+
+    protected ListenerController groupsListener;
+
+    // UI elements
+    protected ProgressBar spinner;
+    protected TextView name;
+    protected TextView email;
+    protected ListView groupsList;
+
+    // Sign in action result code
+    private static final int RC_SIGN_IN = 123;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        spinner = findViewById(R.id.groups_spinner);
-        groupsList = (ListView) findViewById(R.id.groups_list);
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View navigationHeader = navigationView.getHeaderView(0);
 
+        // Initializing UI elements
+        spinner = findViewById(R.id.groups_spinner);
+        groupsList = findViewById(R.id.groups_list);
+        name = navigationHeader.findViewById(R.id.user_name);
+        email = navigationHeader.findViewById(R.id.user_email);
+
+        // Todo: move to setup
         MainMenuController.initialize(FirebaseProxy.getInstance());
         if (MainMenuController.getUserInfo() == null) {
             startAuthorisation();
@@ -75,6 +86,7 @@ public class MainMenuActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         spinner.setVisibility(View.VISIBLE);
+        showUserInfo();
         setGroupListener();
         super.onStart();
     }
@@ -107,7 +119,6 @@ public class MainMenuActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
                 showUserInfo();
@@ -144,38 +155,21 @@ public class MainMenuActivity extends AppCompatActivity
 
     private void showUserInfo() {
         UserInfo currentUser = MainMenuController.getUserInfo();
-
-        TextView name = (TextView) findViewById(R.id.userName);
-        TextView email = (TextView) findViewById(R.id.userEmail);
         name.setText(currentUser.getName());
         email.setText(currentUser.getEmail());
     }
 
 
     protected void showGroups(List<GroupId> groups) {
-        GroupListAdapter adapter = new GroupListAdapter(this, groups, new Consumer<GroupId>() {
+        GroupListAdapter adapter =
+                new GroupListAdapter(this, groups, new Consumer<GroupId>() {
             @Override
             public void accept(GroupId groupId) {
-                Intent intent = new Intent(MainMenuActivity.this, DocumentListActivity.class);
-                intent.putExtra("GROUP", groupId);
+                Intent intent = new Intent(
+                        MainMenuActivity.this,
+                        DocumentListActivity.class);
+                intent.putExtra(DocumentListActivity.INTENT_GROUP_EXTRA, groupId);
                 startActivity(intent);
-/*                downloadingProgressBar.setVisibility(View.VISIBLE);
-                ///TODO: disable sign out
-                MainMenuController.onGetDocumentList(groupId, new ResultListener<List<DocumentId>>() {
-                    @Override
-                    public void onResult(List<DocumentId> documentIds) {
-                        Intent intent = new Intent(MainMenuActivity.this, DocumentListActivity.class);
-                        intent.putExtra("DOCUMENTS", (Serializable) documentIds);
-                        downloadingProgressBar.setVisibility(View.GONE);
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        downloadingProgressBar.setVisibility(View.GONE);
-                        Toast.makeText(getApplicationContext(), "Failed to load data. Please, try again", Toast.LENGTH_LONG).show();
-                    }
-                }); */
             }
         });
         groupsList.setAdapter(adapter);
@@ -194,7 +188,7 @@ public class MainMenuActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -218,7 +212,9 @@ public class MainMenuActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Toast.makeText(getApplicationContext(), "Do you like settings?", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),
+                    "Do you like settings?",
+                    Toast.LENGTH_LONG).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -241,7 +237,7 @@ public class MainMenuActivity extends AppCompatActivity
                     Toast.LENGTH_LONG).show();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

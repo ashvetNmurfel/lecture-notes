@@ -21,22 +21,30 @@ import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 import ru.spbau.lecturenotes.uiElements.DocumentListAdapter;
 
 public class DocumentListActivity extends AppCompatActivity {
+    // Logging tag
     private static final String TAG = "DocumentListActivity";
+    public static final String INTENT_GROUP_EXTRA = "INTENT_GROUP_EXTRA";
+
+    // UI elements
     protected ProgressBar spinner;
     protected ListView documents_list;
     protected ListenerController documentsListener;
+
+    // Group got from intent
     protected GroupId shownGroup = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_document_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Initializing UI elements
         spinner = findViewById(R.id.documents_list_spinner);
-        documents_list = (ListView) findViewById(R.id.documents_list);
-        shownGroup = (GroupId) getIntent().getSerializableExtra("GROUP");
+        documents_list = findViewById(R.id.documents_list);
+
+        shownGroup = (GroupId) getIntent().getSerializableExtra(INTENT_GROUP_EXTRA);
     }
 
     @Override
