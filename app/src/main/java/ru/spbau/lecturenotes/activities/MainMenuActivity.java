@@ -41,8 +41,7 @@ public class MainMenuActivity extends AppCompatActivity
     protected ListenerController groupsListener;
     protected ProgressBar spinner;
 
-    protected ListView gropsList;
-    protected ProgressBar downloadingProgressBar;
+    protected ListView groupsList;
     private static final int RC_SIGN_IN = 123;
     public static final String KEY_NODE_ID = "nodeId";
     private static final String TAG = "MainMenuActivity";
@@ -61,7 +60,7 @@ public class MainMenuActivity extends AppCompatActivity
         toggle.syncState();
 
         spinner = findViewById(R.id.groups_spinner);
-        gropsList = (ListView) findViewById(R.id.groups_list);
+        groupsList = (ListView) findViewById(R.id.groups_list);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -179,7 +178,7 @@ public class MainMenuActivity extends AppCompatActivity
                 }); */
             }
         });
-        gropsList.setAdapter(adapter);
+        groupsList.setAdapter(adapter);
     }
 
     protected void startAuthorisation() {
