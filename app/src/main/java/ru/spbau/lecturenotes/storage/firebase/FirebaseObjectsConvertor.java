@@ -6,6 +6,8 @@ import java.util.List;
 
 import ru.spbau.lecturenotes.storage.Attachment;
 import ru.spbau.lecturenotes.storage.AttachmentType;
+import ru.spbau.lecturenotes.storage.Comment;
+import ru.spbau.lecturenotes.storage.CommentContent;
 import ru.spbau.lecturenotes.storage.DocumentDataReference;
 import ru.spbau.lecturenotes.storage.DocumentDataType;
 import ru.spbau.lecturenotes.storage.identifiers.CommentId;
@@ -47,5 +49,25 @@ public class FirebaseObjectsConvertor {
                 fattachment.getCreationTimestamp(),
                 fattachment.getStorageReference()
         );
+    }
+
+    public static Comment toComment(FirebaseComment firebaseComment) {
+        return new Comment(firebaseComment.getId(),
+                firebaseComment.getParent(),
+                FirebaseObjectsConvertor.toCommentContent(firebaseComment.getContent()),
+                firebaseComment.getAuthor(),
+                firebaseComment.getCreationTimestamp(),
+                firebaseComment.isEdited(),
+                firebaseComment.getEditTimestamp()
+        );
+    }
+
+    private static CommentContent toCommentContent(FirebaseCommentContent content) {
+        Attachment[] attachments = new Attachment[content.getAttachments().length];
+        for (int i = 0; i < content.getAttachments().length; i++) {
+            FirebaseAttachment firebaseAttachment = content.getAttachments()[i];
+            attachments[i] = FirebaseObjectsConvertor.toAttachment(firebaseAttachment);
+        }
+        return new CommentContent(content.getText(), attachments);
     }
 }
