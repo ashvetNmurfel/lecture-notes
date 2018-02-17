@@ -43,9 +43,6 @@ public class PdfActivity extends AppCompatActivity {
         PdfPageAdapter adapter = new PdfPageAdapter(this, arrayList, lv);
         lv.setAdapter(adapter);
 
-        View view = adapter.getView(0, null, null);
-        PhotoView pagePicture = (PhotoView) view.findViewById(R.id.pagePicture);
-
         DragRectView dragRectView = (DragRectView) findViewById(R.id.dragRect);
         dragRectView.setOnUpCallback(new DragRectView.OnUpCallback() {
             @Override
@@ -94,49 +91,50 @@ public class PdfActivity extends AppCompatActivity {
         EditText editText = (EditText) findViewById(R.id.editTextComment);
         CommentBuilder commentBuilder = new CommentBuilder("anon", editText.getText().toString());
 
-        ImageView imageView = (ImageView) findViewById(R.id.justImage);
+//        ImageView imageView = (ImageView) findViewById(R.id.justImage);
+        PhotoView photoView = (PhotoView) findViewById(R.id.pagePicture);
         DragRectView dragRect = (DragRectView) findViewById(R.id.dragRect);
 
-        Log.i("image", imageView.getWidth() + " " + imageView.getHeight());
-        Log.i("image", imageView.getDrawable().getIntrinsicWidth() + " " + imageView.getDrawable().getIntrinsicHeight() + " ");
+        Log.i("image", "CurrentRect");
+        Log.i("image", currentRect.toShortString());
 
-        float[] f = new float[9];
-        imageView.getImageMatrix().getValues(f);
-        final float scaleX = f[Matrix.MSCALE_X];
-        final float scaleY = f[Matrix.MSCALE_Y];
+        Log.i("image", "getMatrix");
+        tryMatrix(photoView.getMatrix());
 
-        Log.i("image", scaleX + " " + scaleY);
+        Log.i("image", "getImageMatrix");
+        tryMatrix(photoView.getImageMatrix());
 
-        Log.i("image",
-                imageView.getDrawable().getIntrinsicWidth() * scaleX + " " +
-                imageView.getDrawable().getIntrinsicHeight() * scaleY);
+        Matrix matrix = new Matrix();
 
-        int LEFT_OFFSET = (imageView.getWidth() - round(imageView.getDrawable().getIntrinsicWidth() * scaleX)) / 2;
+        Log.i("image", "getDisplayMatrix");
+        photoView.getDisplayMatrix(matrix);
+        tryMatrix(matrix);
 
-        Log.i("image", LEFT_OFFSET + "");
-
-        float[] points = {0, 0};
-        imageView.getImageMatrix().mapPoints(points);
-        Log.i("image", points[0] + " " + points[1]);
+        Log.i("image", "getSuppMatrix");
+        photoView.getSuppMatrix(matrix);
+        tryMatrix(matrix);
 
 
+    }
 
-
+    private void tryMatrix(Matrix matrix) {
         RectF result1 = new RectF(currentRect);
         RectF result2 = new RectF(currentRect);
 
-        Matrix matrix = imageView.getImageMatrix();
         Matrix inverse = new Matrix();
         matrix.invert(inverse);
 
         matrix.mapRect(result1);
         inverse.mapRect(result2);
 
-        Log.i("image", currentRect.toShortString());
-        Log.i("image", result1.toShortString());
-        Log.i("image", result2.toShortString());
+        Log.i("image", round(result1).toShortString());
+        Log.i("image", round(result2).toShortString());
 
+    }
 
-
+    private Rect round(RectF rectF) {
+        Rect rect = new Rect();
+        rectF.round(rect);
+        return rect;
     }
 }

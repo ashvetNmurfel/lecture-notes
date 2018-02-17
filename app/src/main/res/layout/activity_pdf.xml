@@ -18,11 +18,17 @@
         android:layout_weight="50"
         android:visibility="gone">
 
-        <ImageView
-            android:id="@+id/justImage"
+        <com.github.chrisbanes.photoview.PhotoView
+            android:id="@+id/photoView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/term1_algebra_05" />
+            android:src="@drawable/term1_algebra_05"/>
+
+        <!--<ImageView-->
+            <!--android:id="@+id/justImage"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:src="@drawable/term1_algebra_05" />-->
 
         <ru.spbau.lecturenotes.DragRectView
             android:id="@+id/dragRect"
