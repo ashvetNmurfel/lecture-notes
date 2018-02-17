@@ -111,7 +111,6 @@ public class FirebaseProxy implements DatabaseInterface {
         }
     }
 
-
     @Override
     public void getDiscussion(final DiscussionId discussion, final @NotNull ResultListener<Discussion> listener) {
         Log.i(TAG, "Attempting to get Discussion" + discussion.getKey());
@@ -295,6 +294,17 @@ public class FirebaseProxy implements DatabaseInterface {
             @Override
             public void accept(CommentId commentId, ResultListener<Comment> listener) {
                 getComment(commentId, listener);
+            }
+        });
+    }
+
+    @Override
+    public void getDiscussionsList(final List<DiscussionId> ids, final ResultListener<List<Discussion>> listener) {
+        Log.i(TAG, "Attempting to get Discussions list");
+        new LoadListListener<>(ids, listener, new BiConsumer<DiscussionId, ResultListener<Discussion>>() {
+            @Override
+            public void accept(DiscussionId discussionId, ResultListener<Discussion> listener) {
+                getDiscussion(discussionId, listener);
             }
         });
     }
