@@ -41,8 +41,20 @@ public class CommentActivity extends AppCompatActivity {
         DragRectView dragRect = (DragRectView) findViewById(R.id.dragRect);
         ImageView imageView = (ImageView) findViewById(R.id.justImage);
 
-//        Log.i("image", imageView.getWidth() + " " + imageView.getHeight());
-        
+        Log.i("image", imageView.getWidth() + " " + imageView.getHeight());
+        Log.i("image", imageView.getDrawable().getIntrinsicWidth() + " " + imageView.getDrawable().getIntrinsicHeight() + " ");
+
+        float[] f = new float[9];
+        imageView.getImageMatrix().getValues(f);
+        final float scaleX = f[Matrix.MSCALE_X];
+        final float scaleY = f[Matrix.MSCALE_Y];
+
+        Log.i("image", scaleX + " " + scaleY);
+
+        Log.i("image",
+                imageView.getDrawable().getIntrinsicWidth() * scaleX + " " +
+                imageView.getDrawable().getIntrinsicHeight() * scaleY);
+
         commentList.add(commentBuilder.toPdfComment());
     }
 }

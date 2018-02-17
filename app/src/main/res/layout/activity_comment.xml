@@ -21,7 +21,6 @@
             android:src="@drawable/term1_algebra_05"
             android:visibility="visible"/>
 
-
         <ru.spbau.lecturenotes.DragRectView
             android:id="@+id/dragRect"
             android:layout_width="wrap_content"

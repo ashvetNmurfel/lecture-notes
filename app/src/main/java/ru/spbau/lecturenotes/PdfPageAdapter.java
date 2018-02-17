@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.github.chrisbanes.photoview.OnViewTapListener;
@@ -19,9 +20,9 @@ public class PdfPageAdapter extends BaseAdapter {
     private final Context context;
     private final ArrayList<PdfPage> pageList;
     private final LayoutInflater layoutInflater;
-    private final TouchableListView parent;
+    private final ListView parent;
 
-    public PdfPageAdapter(Context context, ArrayList<PdfPage> pageList, TouchableListView parent) {
+    public PdfPageAdapter(Context context, ArrayList<PdfPage> pageList, ListView parent) {
         this.context = context;
         this.pageList = pageList;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
