@@ -1,5 +1,6 @@
 package ru.spbau.lecturenotes.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,6 +30,7 @@ public class DocumentListActivity extends AppCompatActivity {
     protected ProgressBar spinner;
     protected ListView documents_list;
     protected ListenerController documentsListener;
+    protected ProgressBar downloadingProgressBar;
 
     // Group got from intent
     protected GroupId shownGroup = null;
@@ -43,6 +45,7 @@ public class DocumentListActivity extends AppCompatActivity {
         // Initializing UI elements
         spinner = findViewById(R.id.documents_list_spinner);
         documents_list = findViewById(R.id.documents_list);
+        downloadingProgressBar = findViewById(R.id.dowloading_document_progress_bar);
 
         shownGroup = (GroupId) getIntent().getSerializableExtra(INTENT_GROUP_EXTRA);
     }
@@ -76,15 +79,13 @@ public class DocumentListActivity extends AppCompatActivity {
                 new Consumer<DocumentId>() {
             @Override
             public void accept(DocumentId documentId) {
+                //Todo: delete toast v
                 Toast.makeText(getApplicationContext(), documentId.getFilename(), Toast.LENGTH_LONG).show();
-                //Intent intent = new Intent(DocumentListActivity.this, DocumentListActivity.class);
-                //intent.putExtra("GROUP", groupId);
-/*                downloadingProgressBar.setVisibility(View.VISIBLE);
-                ///TODO: disable sign out
-                MainMenuController.onGetDocumentList(groupId, new ResultListener<List<DocumentId>>() {
+                downloadingProgressBar.setVisibility(View.VISIBLE);
+                /*MainMenuController.onGetDocumentList(groupId, new ResultListener<List<DocumentId>>() {
                     @Override
                     public void onResult(List<DocumentId> documentIds) {
-                        Intent intent = new Intent(MainMenuActivity.this, DocumentListActivity.class);
+                        Intent intent = new Intent(DocumentListActivity.this, DocumentListActivity.class);
                         intent.putExtra("DOCUMENTS", (Serializable) documentIds);
                         downloadingProgressBar.setVisibility(View.GONE);
                         startActivity(intent);
