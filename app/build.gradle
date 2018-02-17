@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion "27.0.1"
     defaultConfig {
         applicationId "ru.spbau.lecturenotes"
@@ -20,7 +20,11 @@ android {
 }
 
 dependencies {
-    compile project(':android-pdf-viewer')
+    annotationProcessor 'com.google.dagger:dagger-compiler:+'
+
+    compile 'com.github.chrisbanes:PhotoView:+'
+
+    annotationProcessor 'org.androidannotations:androidannotations:4.0.0'
     provided 'org.androidannotations:androidannotations:4.0.0'
     compile 'org.androidannotations:androidannotations-api:4.0.0'
 

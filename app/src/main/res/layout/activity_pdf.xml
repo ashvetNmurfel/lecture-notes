@@ -1,74 +1,37 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <com.github.barteksc.pdfviewer.PDFView
-        android:id="@+id/pdfView"
+    <ru.spbau.lecturenotes.TouchableListView
+        android:id="@+id/pdfPictureListView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="50" />
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/viewModeSettings"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="50">
 
-    </com.github.barteksc.pdfviewer.PDFView>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="50"
-        android:orientation="vertical">
-
-
-        <ImageView
-            android:layout_width="150px"
-            android:layout_height="150px"
-            android:id="@+id/myImage"/>
-
         <ListView
             android:id="@+id/commentsList"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="80"
-            android:gravity="top"
-            android:scrollbars="vertical" />
+            android:layout_height="match_parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="20"
-            android:gravity="bottom">
-
-            <ImageButton
-                android:id="@+id/makePhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="end"
-                android:src="@mipmap/ic_add_photo"
-                android:background="#00000000"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:onClick="onClickButtonAddPhoto"/>
-
-            <EditText
-                android:id="@+id/yourComment"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="100"
-                android:hint="@string/your_comment"
-                android:inputType="textImeMultiLine" />
-
-            <ImageButton
-                android:id="@+id/sendComment"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="end"
-                android:src="@drawable/ic_stat_name"
-                android:background="#00000000"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:onClick="onClickButton"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:onClick="onClickPlusButtonGoToCommentMode"
+            android:src="@drawable/ic_action_add" />
+    </RelativeLayout>
 </LinearLayout>

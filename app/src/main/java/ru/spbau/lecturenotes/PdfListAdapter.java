@@ -6,13 +6,11 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import ru.spbau.lecturenotes.data.PdfFileStorage;
 
@@ -65,7 +63,8 @@ public class PdfListAdapter extends ArrayAdapter<PdfFileStorage> {
         if (storage.isDirectory()) {
             intent = MainMenuActivity.createIntentForNode(this.context, storage.getName());
         } else {
-            intent = PDFActivity.createIntentForFile(this.context, storage.getFile());
+//            intent = OldPdfActivity.createIntentForFile(this.context, storage.getFile());
+            intent = new Intent(getContext(), PdfActivity.class);
             Toast.makeText(context, storage.getFile(), Toast.LENGTH_LONG).show();
         }
         this.context.startActivity(intent);

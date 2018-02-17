@@ -25,6 +25,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        startActivity(new Intent(this, PdfActivity.class));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
         ArrayList<PdfFileStorage> sectionsList = new ArrayList<>();
