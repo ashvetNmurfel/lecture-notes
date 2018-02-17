@@ -79,6 +79,8 @@ public class MainMenuActivity extends AppCompatActivity
         MainMenuController.initialize(FirebaseProxy.getInstance());
         if (MainMenuController.getUserInfo() == null) {
             startAuthorisation();
+        } else {
+            showUserInfo();
         }
     }
 
@@ -86,7 +88,6 @@ public class MainMenuActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         spinner.setVisibility(View.VISIBLE);
-        showUserInfo();
         setGroupListener();
         super.onStart();
     }
