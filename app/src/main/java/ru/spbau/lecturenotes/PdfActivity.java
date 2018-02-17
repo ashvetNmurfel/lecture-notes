@@ -2,6 +2,8 @@ package ru.spbau.lecturenotes;
 
 import android.content.Intent;
 import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,9 +25,12 @@ import java.util.Arrays;
 import ru.spbau.lecturenotes.data.PdfComment;
 import ru.spbau.lecturenotes.services.comments.CommentBuilder;
 
+import static java.lang.Math.round;
+
 public class PdfActivity extends AppCompatActivity {
     private ArrayList<ru.spbau.lecturenotes.data.PdfComment> commentList = new ArrayList<>();
     public static final int COMMENT_MODE_ACTIVITY_CODE = 111;
+    private Rect currentRect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +45,14 @@ public class PdfActivity extends AppCompatActivity {
 
         View view = adapter.getView(0, null, null);
         PhotoView pagePicture = (PhotoView) view.findViewById(R.id.pagePicture);
+
+        DragRectView dragRectView = (DragRectView) findViewById(R.id.dragRect);
+        dragRectView.setOnUpCallback(new DragRectView.OnUpCallback() {
+            @Override
+            public void onRectFinished(Rect rect) {
+                currentRect = rect;
+            }
+        });
     }
 
     private boolean isInCommentMode;
@@ -62,7 +75,7 @@ public class PdfActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (isInCommentMode) {
             isInCommentMode = false;
-            
+
             ListView listView = (ListView) findViewById(R.id.pdfPictureListView);
             FrameLayout frameLayout = (FrameLayout) findViewById(R.id.pdfPage);
             RelativeLayout viewModeSettings = (RelativeLayout) findViewById(R.id.viewModeSettings);
@@ -96,8 +109,34 @@ public class PdfActivity extends AppCompatActivity {
 
         Log.i("image",
                 imageView.getDrawable().getIntrinsicWidth() * scaleX + " " +
-                        imageView.getDrawable().getIntrinsicHeight() * scaleY);
+                imageView.getDrawable().getIntrinsicHeight() * scaleY);
 
-        commentList.add(commentBuilder.toPdfComment());
+        int LEFT_OFFSET = (imageView.getWidth() - round(imageView.getDrawable().getIntrinsicWidth() * scaleX)) / 2;
+
+        Log.i("image", LEFT_OFFSET + "");
+
+        float[] points = {0, 0};
+        imageView.getImageMatrix().mapPoints(points);
+        Log.i("image", points[0] + " " + points[1]);
+
+
+
+
+        RectF result1 = new RectF(currentRect);
+        RectF result2 = new RectF(currentRect);
+
+        Matrix matrix = imageView.getImageMatrix();
+        Matrix inverse = new Matrix();
+        matrix.invert(inverse);
+
+        matrix.mapRect(result1);
+        inverse.mapRect(result2);
+
+        Log.i("image", currentRect.toShortString());
+        Log.i("image", result1.toShortString());
+        Log.i("image", result2.toShortString());
+
+
+
     }
 }
