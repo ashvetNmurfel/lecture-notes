@@ -3,20 +3,28 @@ package ru.spbau.lecturenotes.controllers;
 import android.arch.core.util.Function;
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
+
+import javax.security.auth.callback.Callback;
 
 import ru.spbau.lecturenotes.data.PdfFileStorage;
 import ru.spbau.lecturenotes.services.FileSyncService;
 import ru.spbau.lecturenotes.services.MetadataSyncService;
 import ru.spbau.lecturenotes.services.UserInfoService;
 import ru.spbau.lecturenotes.storage.DatabaseInterface;
+import ru.spbau.lecturenotes.storage.Document;
+import ru.spbau.lecturenotes.storage.Group;
 import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.UserInfo;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 import ru.spbau.lecturenotes.storage.identifiers.GroupId;
+import ru.spbau.lecturenotes.utils.DataHierarchyTree;
 
 public class MainMenuController {
     private HashMap<String, PdfFileStorage> storage = new HashMap<>();
@@ -95,12 +103,28 @@ public class MainMenuController {
         return storage.get(name);
     }
 
-    public static ListenerController applyWhenGroupListChanges(final Function<List<GroupId>, Void> function) {
+    public static ListenerController applyWhenGroupListChanges(final Consumer<List<GroupId>> consumer) {
         return INSTANCE.metadataService.listenToGroupsList(new ResultListener<List<GroupId>>() {
             @Override
             public void onResult(List<GroupId> result) {
-                Log.i(TAG, "List of groups was received by controller. Handling to UI function...");
-                function.apply(result);
+                Log.i(TAG, "List of groups was received by controller. Handling to function...");
+                consumer.accept(result);
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                Log.e(TAG, "Failed to load groups list into controller. Error: ", error);
+            }
+        });
+    }
+
+    public static ListenerController applyWhenDocumentListChanges(final @NotNull GroupId group,
+                                                                  final @NotNull Consumer<List<DocumentId>> consumer) {
+        return INSTANCE.metadataService.listenToDocumentList(group, new ResultListener<List<DocumentId>>() {
+            @Override
+            public void onResult(List<DocumentId> result) {
+                Log.i(TAG, "List of groups was received by controller. Handling to function...");
+                consumer.accept(result);
             }
 
             @Override

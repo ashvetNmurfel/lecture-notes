@@ -1,6 +1,5 @@
 package ru.spbau.lecturenotes.activities;
 
-import android.arch.core.util.Function;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,6 +26,7 @@ import com.google.android.gms.tasks.Task;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import ru.spbau.lecturenotes.R;
 import ru.spbau.lecturenotes.controllers.MainMenuController;
@@ -38,8 +38,11 @@ import ru.spbau.lecturenotes.uiElements.GroupListAdapter;
 
 public class MainMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    protected ListenerController listenerController;
+    protected ListenerController groupsListener;
     protected ProgressBar spinner;
+
+    protected ListView gropsList;
+    protected ProgressBar downloadingProgressBar;
     private static final int RC_SIGN_IN = 123;
     public static final String KEY_NODE_ID = "nodeId";
     private static final String TAG = "MainMenuActivity";
@@ -50,7 +53,6 @@ public class MainMenuActivity extends AppCompatActivity
         setContentView(R.layout.activity_main_menu);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        setTitle("Select Group");
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -59,6 +61,7 @@ public class MainMenuActivity extends AppCompatActivity
         toggle.syncState();
 
         spinner = findViewById(R.id.groups_spinner);
+        gropsList = (ListView) findViewById(R.id.groups_list);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -95,6 +98,7 @@ public class MainMenuActivity extends AppCompatActivity
                     public void onComplete(@NonNull Task<Void> task) {
                         unsubscribeFromGroupListChanges();
                         clearList();
+                        //ToDo: invalidate cache
                         startAuthorisation();
                     }
                 });
@@ -117,27 +121,26 @@ public class MainMenuActivity extends AppCompatActivity
     }
 
     private void setGroupListener() {
-        if (listenerController != null) {
+        if (groupsListener != null) {
             Log.w(TAG, "Trying to set listener while it's still active. Denied");
             return;
         }
-        listenerController = MainMenuController.applyWhenGroupListChanges(new Function<List<GroupId>, Void>() {
+        groupsListener = MainMenuController.applyWhenGroupListChanges(new Consumer<List<GroupId>>() {
             @Override
-            public Void apply(List<GroupId> groupIds) {
+            public void accept(List<GroupId> groupIds) {
                 spinner.setVisibility(View.GONE);
                 showGroups(groupIds);
-                return null;
             }
         });
     }
 
     private void unsubscribeFromGroupListChanges() {
-        if (listenerController == null) {
+        if (groupsListener == null) {
             Log.w(TAG, "Attempting to unsubscribe with an empty listener");
         } else {
-            listenerController.stopListener();
+            groupsListener.stopListener();
         }
-        listenerController = null;
+        groupsListener = null;
     }
 
     private void showUserInfo() {
@@ -151,8 +154,31 @@ public class MainMenuActivity extends AppCompatActivity
 
 
     protected void showGroups(List<GroupId> groups) {
-        GroupListAdapter adapter = new GroupListAdapter(this, groups);
-        ListView gropsList = (ListView) findViewById(R.id.groups_list);
+        GroupListAdapter adapter = new GroupListAdapter(this, groups, new Consumer<GroupId>() {
+            @Override
+            public void accept(GroupId groupId) {
+                Intent intent = new Intent(MainMenuActivity.this, DocumentListActivity.class);
+                intent.putExtra("GROUP", groupId);
+                startActivity(intent);
+/*                downloadingProgressBar.setVisibility(View.VISIBLE);
+                ///TODO: disable sign out
+                MainMenuController.onGetDocumentList(groupId, new ResultListener<List<DocumentId>>() {
+                    @Override
+                    public void onResult(List<DocumentId> documentIds) {
+                        Intent intent = new Intent(MainMenuActivity.this, DocumentListActivity.class);
+                        intent.putExtra("DOCUMENTS", (Serializable) documentIds);
+                        downloadingProgressBar.setVisibility(View.GONE);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        downloadingProgressBar.setVisibility(View.GONE);
+                        Toast.makeText(getApplicationContext(), "Failed to load data. Please, try again", Toast.LENGTH_LONG).show();
+                    }
+                }); */
+            }
+        });
         gropsList.setAdapter(adapter);
     }
 

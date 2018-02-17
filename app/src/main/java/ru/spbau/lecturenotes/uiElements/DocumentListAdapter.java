@@ -15,12 +15,12 @@ import java.util.function.Consumer;
 
 import ru.spbau.lecturenotes.R;
 import ru.spbau.lecturenotes.activities.DocumentListActivity;
-import ru.spbau.lecturenotes.storage.identifiers.GroupId;
+import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 
-public class GroupListAdapter extends ArrayAdapter<GroupId> {
+public class DocumentListAdapter extends ArrayAdapter<DocumentId> {
     private final Activity context;
-    private final List<GroupId> groups;
-    private final Consumer<GroupId> onClickCallback;
+    private final List<DocumentId> documents;
+    private final Consumer<DocumentId> onClickCallback;
 
     @Override
     public boolean areAllItemsEnabled()
@@ -34,10 +34,10 @@ public class GroupListAdapter extends ArrayAdapter<GroupId> {
         return true;
     }
 
-    public GroupListAdapter(Activity context, List<GroupId> groups, Consumer<GroupId> onClickCallback) {
-        super(context, R.layout.listview_pdf_item, groups);
+    public DocumentListAdapter(Activity context, List<DocumentId> documents, Consumer<DocumentId> onClickCallback) {
+        super(context, R.layout.listview_pdf_item, documents);
         this.context = context;
-        this.groups = groups;
+        this.documents = documents;
         this.onClickCallback = onClickCallback;
     }
 
@@ -56,28 +56,28 @@ public class GroupListAdapter extends ArrayAdapter<GroupId> {
             holder = (Holder)view.getTag();
         }
 
-        holder.group = groups.get(position);
-        holder.nameTextField.setText(holder.group.getName());
-        holder.infoTextField.setText(holder.group.getKey());
+        holder.document = documents.get(position);
+        holder.nameTextField.setText(holder.document.getFilename());
+        holder.infoTextField.setText(holder.document.getKey());
 
         return view;
     }
 
-    private void onItemClicked(Context context, GroupId group) {
+    private void onItemClicked(Context context, DocumentId document) {
         Intent intent = new Intent(this.context, DocumentListActivity.class);
-        Toast.makeText(context, group.getName(), Toast.LENGTH_LONG).show();
-        onClickCallback.accept(group);
+        Toast.makeText(context, document.getFilename(), Toast.LENGTH_LONG).show();
+        onClickCallback.accept(document);
     }
 
 
     private class Holder implements View.OnClickListener {
         private TextView nameTextField;
         private TextView infoTextField;
-        private GroupId group;
+        private DocumentId document;
 
         @Override
         public void onClick(View view) {
-            GroupListAdapter.this.onItemClicked(view.getContext(), group);
+            DocumentListAdapter.this.onItemClicked(view.getContext(), document);
         }
     }
 }
