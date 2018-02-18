@@ -6,12 +6,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
+import ru.spbau.lecturenotes.storage.Comment;
 import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.User;
 
 public class FirebaseComment {
     protected CommentId id;
-    protected String parent;
+    protected CommentId parent;
     protected FirebaseCommentContent content;
     protected User author;
     @ServerTimestamp
@@ -30,7 +31,7 @@ public class FirebaseComment {
     }
 
     @NotNull
-    public String getParent() {
+    public CommentId getParent() {
         return parent;
     }
 

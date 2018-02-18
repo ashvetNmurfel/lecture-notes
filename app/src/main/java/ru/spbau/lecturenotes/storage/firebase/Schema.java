@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.jetbrains.annotations.NotNull;
 
 import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 import ru.spbau.lecturenotes.storage.identifiers.GroupId;
@@ -60,7 +61,13 @@ public class Schema {
   @NonNull
   public static CollectionReference comments(FirebaseFirestore db, @NotNull DiscussionId discussionId) {
     return discussion(db, discussionId)
-        .collection(COMMENTS);
+            .collection(COMMENTS);
+  }
+
+  @NonNull
+  public static DocumentReference comment(FirebaseFirestore db, @NotNull CommentId commentId) {
+    return comments(db, commentId.getDiscussionId())
+        .document(commentId.getKey());
   }
 
   @NonNull

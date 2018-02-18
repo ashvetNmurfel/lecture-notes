@@ -19,13 +19,23 @@ public interface DatabaseInterface {
 
     void getAttachment(AttachmentId attachment, ResultListener<Attachment> listener);
 
-    void getDocumentsList(GroupId group, ResultListener<List<DocumentId>> listener);
+    void getComment(CommentId comment, ResultListener<Comment> listener);
 
-    void getGroupsList(ResultListener<List<GroupId>> listener);
+    void getCommentsList(DiscussionId discussionId, ResultListener<List<Comment>> listener);
 
-    void getCommentsList(DiscussionId discussionId, ResultListener<List<CommentId>> listResultListener);
+    void getCommentsList(List<CommentId> ids, ResultListener<List<Comment>> listener);
 
-    void getDiscussionsList(DocumentId documentId, ResultListener<List<DiscussionId>> listener);
+    void getDiscussionsList(List<DiscussionId> ids, ResultListener<List<Discussion>> listener);
+
+    void getAttachmentsList(List<AttachmentId> ids, ResultListener<List<Attachment>> listener);
+
+    void getDocumentIdsList(GroupId group, ResultListener<List<DocumentId>> listener);
+
+    void getGroupIdsList(ResultListener<List<GroupId>> listener);
+
+    void getCommentIdsList(DiscussionId discussionId, ResultListener<List<CommentId>> listResultListener);
+
+    void getDiscussionIdsList(DocumentId documentId, ResultListener<List<DiscussionId>> listener);
 
     void addDiscussion(NewDiscussionRequest request, ResultListener<Discussion> listener);
 

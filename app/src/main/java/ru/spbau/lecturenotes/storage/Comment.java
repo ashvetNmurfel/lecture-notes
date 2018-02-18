@@ -20,6 +20,21 @@ public class Comment {
     protected boolean isEdited;
     protected Date editTimestamp;
 
+    public Comment(CommentId id,
+                   CommentId parentId,
+                   CommentContent content,
+                   User author,
+                   Date creationTimestamp,
+                   boolean isEdited,
+                   Date editTimestamp) {
+        this.id = id;
+        this.parentId = parentId;
+        this.content = content;
+        this.author = author;
+        this.creationTimestamp = creationTimestamp;
+        this.isEdited = isEdited;
+        this.editTimestamp = editTimestamp;
+    }
 
     @Nullable
     public CommentId getId() {
