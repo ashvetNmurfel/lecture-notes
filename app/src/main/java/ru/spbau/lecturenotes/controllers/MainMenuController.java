@@ -123,13 +123,13 @@ public class MainMenuController {
         return INSTANCE.metadataService.listenToDocumentList(group, new ResultListener<List<DocumentId>>() {
             @Override
             public void onResult(List<DocumentId> result) {
-                Log.i(TAG, "List of groups was received by controller. Handling to function...");
+                Log.i(TAG, "List of documents was received by controller. Handling to function...");
                 consumer.accept(result);
             }
 
             @Override
             public void onError(Throwable error) {
-                Log.e(TAG, "Failed to load groups list into controller. Error: ", error);
+                Log.e(TAG, "Failed to load documents list into controller. Error: ", error);
             }
         });
     }
