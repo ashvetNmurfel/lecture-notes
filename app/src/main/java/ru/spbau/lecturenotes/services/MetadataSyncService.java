@@ -2,11 +2,9 @@ package ru.spbau.lecturenotes.services;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ru.spbau.lecturenotes.storage.DatabaseInterface;
-import ru.spbau.lecturenotes.storage.Group;
 import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
@@ -23,7 +21,7 @@ public class MetadataSyncService {
         return db.setGroupsListListener(new DatabaseInterface.GroupListChangeListener() {
             @Override
             public void onGroupListUpdated() {
-               db.getGroupsList(listener);
+               db.getGroupIdsList(listener);
             }
         });
     }
@@ -32,7 +30,7 @@ public class MetadataSyncService {
         return db.setDocumentListListener(group, new DatabaseInterface.DocumentListChangeListener() {
             @Override
             public void onDocumentListUpdated(final @NotNull GroupId groupId) {
-                db.getDocumentsList(groupId, listener);
+                db.getDocumentIdsList(groupId, listener);
             }
         });
     }
