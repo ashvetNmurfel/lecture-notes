@@ -30,7 +30,7 @@
         <!--android:layout_height="match_parent"-->
         <!--android:src="@drawable/term1_algebra_05" />-->
 
-        <ru.spbau.lecturenotes.DragRectView
+        <ru.spbau.lecturenotes.uiElements.PdfViewer.DragRectView
             android:id="@+id/dragRect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

@@ -1,18 +1,17 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="400dp"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="300dp"
+    android:layout_height="400dp"
     android:background="@android:color/background_dark">
 
     <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/pagePicture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/pagePicture"
         android:src="@drawable/term1_algebra_05" />
 
-    <ru.spbau.lecturenotes.DragRectView
+    <ru.spbau.lecturenotes.uiElements.PdfViewer.DragRectView
+        android:id="@+id/dragRect"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/dragRect" />
+        android:layout_height="match_parent" />
 
 </RelativeLayout>
