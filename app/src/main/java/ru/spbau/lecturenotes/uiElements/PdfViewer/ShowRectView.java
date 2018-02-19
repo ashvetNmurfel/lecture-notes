@@ -7,7 +7,6 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Toast;
 
 public class ShowRectView extends View {
     public ShowRectView(Context context) {

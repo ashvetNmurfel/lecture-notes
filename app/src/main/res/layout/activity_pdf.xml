@@ -27,7 +27,8 @@
         <ru.spbau.lecturenotes.uiElements.PdfViewer.DragRectView
             android:id="@+id/dragRect"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
     </FrameLayout>
 
 
@@ -63,12 +64,21 @@
         android:layout_weight="50"
         android:visibility="gone">
 
+        <ToggleButton
+            android:id="@+id/toggleButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textOff="@string/in_zooming_mode"
+            android:textOn="@string/in_selecting_rect_mode"
+            android:onClick="onToggleButtonChangeMode"/>
+        
         <ListView
             tools:listitem="@layout/listview_attach_image_item"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_above="@+id/editTextComment"
-            android:background="@color/colorPrimary" />
+            android:background="@color/colorPrimary"
+            android:visibility="invisible"/>
 
         <ImageButton
             android:id="@+id/imageButtonAttachment"

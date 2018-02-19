@@ -87,7 +87,6 @@ public class PdfActivity extends AppCompatActivity {
         commentListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                
                 return false;
             }
         });
@@ -156,5 +155,10 @@ public class PdfActivity extends AppCompatActivity {
         comment.rectF = rectF;
         comment.text = rectF.toShortString();
         commentList.add(comment);
+    }
+
+    public void onToggleButtonChangeMode(View view) {
+        DragRectView dragRectView = findViewById(R.id.dragRect);
+        dragRectView.setVisibility(dragRectView.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
     }
 }

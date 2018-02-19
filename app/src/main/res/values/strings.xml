@@ -11,4 +11,6 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_document_list">Select Group</string>
     <string name="title_activity_pdf_viewer">Конспект</string>
+    <string name="in_zooming_mode">In Zoom Mode</string>
+    <string name="in_selecting_rect_mode">In Select Rect Mode</string>
 </resources>
