@@ -11,6 +11,7 @@ import ru.spbau.lecturenotes.storage.DatabaseInterface;
 import ru.spbau.lecturenotes.storage.Discussion;
 import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.ResultListener;
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 
@@ -37,6 +38,12 @@ public class CommentSyncService {
             @NotNull List<DiscussionId> discussionIds,
             @NotNull ResultListener<List<Discussion>> listener) {
         db.getDiscussionsList(discussionIds, listener);
+    }
+
+    public void getComments(
+            @NotNull List<CommentId> commentIds,
+            @NotNull ResultListener<List<Comment>> listener) {
+        db.getCommentsList(commentIds, listener);
     }
 
     public ListenerController listenToCommentList(
