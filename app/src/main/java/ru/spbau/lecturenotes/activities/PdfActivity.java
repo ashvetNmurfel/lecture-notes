@@ -26,10 +26,14 @@ import java.util.List;
 import ru.spbau.lecturenotes.R;
 import ru.spbau.lecturenotes.services.CommentSyncService;
 import ru.spbau.lecturenotes.storage.Discussion;
+import ru.spbau.lecturenotes.storage.DiscussionLocation;
+import ru.spbau.lecturenotes.storage.Rectangle;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.firebase.FirebaseProxy;
 import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
+import ru.spbau.lecturenotes.storage.requests.CommentSketch;
+import ru.spbau.lecturenotes.storage.requests.DiscussionSketch;
 import ru.spbau.lecturenotes.temp.PdfComment;
 import ru.spbau.lecturenotes.temp.PdfPage;
 import ru.spbau.lecturenotes.uiElements.PdfViewer.DragRectView;
@@ -39,7 +43,10 @@ import ru.spbau.lecturenotes.uiElements.PdfViewer.ShowRectView;
 
 public class PdfActivity extends AppCompatActivity {
     private ArrayList<PdfComment> commentList = new ArrayList<>();
+    private DocumentId documentId;
     private int currentPage = 0;
+
+    private CommentSyncService commentSyncService = new CommentSyncService(FirebaseProxy.getInstance());
 
     private List<DiscussionId> discussionIdList = new ArrayList<>();
 
@@ -48,10 +55,9 @@ public class PdfActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf);
 
-        DocumentId documentId = (DocumentId) getIntent().getExtras().get("documentId");
+        documentId = (DocumentId) getIntent().getExtras().get("documentId");
         setTitle(documentId.getFilename());
 
-        CommentSyncService commentSyncService = new CommentSyncService(FirebaseProxy.getInstance());
         commentSyncService.listenToDiscussionList(documentId, new ResultListener<List<DiscussionId>>() {
             @Override
             public void onResult(List<DiscussionId> result) {
@@ -62,8 +68,6 @@ public class PdfActivity extends AppCompatActivity {
             public void onError(Throwable error) {
             }
         });
-
-        
 
 
         ArrayList<PdfPage> pageArrayList = new ArrayList<>(Arrays.asList(new PdfPage(), new PdfPage(), new PdfPage()));
@@ -193,6 +197,24 @@ public class PdfActivity extends AppCompatActivity {
         comment.rectF = rectF;
         comment.text = rectF.toShortString();
         commentList.add(comment);
+
+        DiscussionLocation discussionLocation = new DiscussionLocation(currentPage, new Rectangle());
+        CommentSketch commentSketch = new CommentSketch(editText.getText().toString());
+        DiscussionSketch discussionSketch = new DiscussionSketch(commentSketch, discussionLocation);
+
+        commentSyncService.addDiscussion(documentId, discussionSketch, new ResultListener<Discussion>() {
+            @Override
+            public void onResult(Discussion result) {
+                Toast.makeText(getApplicationContext(), "Comment saved to DB", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                Toast.makeText(getApplicationContext(), "Comment WAS NOT saved to DB", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     public void onToggleButtonChangeMode(View view) {
