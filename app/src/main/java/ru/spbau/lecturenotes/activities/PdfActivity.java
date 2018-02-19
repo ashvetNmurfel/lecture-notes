@@ -1,5 +1,6 @@
 package ru.spbau.lecturenotes.activities;
 
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -7,6 +8,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -18,32 +21,81 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import ru.spbau.lecturenotes.R;
+import ru.spbau.lecturenotes.temp.PdfComment;
 import ru.spbau.lecturenotes.temp.PdfPage;
 import ru.spbau.lecturenotes.uiElements.PdfViewer.DragRectView;
+import ru.spbau.lecturenotes.uiElements.PdfViewer.PdfCommentAdapter;
 import ru.spbau.lecturenotes.uiElements.PdfViewer.PdfPageAdapter;
+import ru.spbau.lecturenotes.uiElements.PdfViewer.ShowRectView;
 
 public class PdfActivity extends AppCompatActivity {
     private ArrayList<ru.spbau.lecturenotes.temp.PdfComment> commentList = new ArrayList<>();
-    private Rect currentRect;
+    private int currentPage = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf);
 
-        ArrayList<PdfPage> arrayList = new ArrayList<>(Arrays.asList(new PdfPage(), new PdfPage(), new PdfPage()));
+        ArrayList<PdfPage> pageArrayList = new ArrayList<>(Arrays.asList(new PdfPage(), new PdfPage(), new PdfPage()));
 
-        ListView lv = findViewById(R.id.pdfPictureListView);
-        PdfPageAdapter adapter = new PdfPageAdapter(this, arrayList, lv);
-        lv.setAdapter(adapter);
+        final ListView pdfPageListView = findViewById(R.id.pdfPictureListView);
+        final PdfPageAdapter pdfPageAdapter = new PdfPageAdapter(this, pageArrayList, pdfPageListView);
+        pdfPageListView.setAdapter(pdfPageAdapter);
 
-        DragRectView dragRectView = findViewById(R.id.dragRect);
-        dragRectView.setOnUpCallback(new DragRectView.OnUpCallback() {
+        pdfPageListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
-            public void onRectFinished(Rect rect) {
-                currentRect = rect;
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                currentPage = firstVisibleItem;
             }
         });
+
+        final ListView commentListView = findViewById(R.id.commentsList);
+        PdfCommentAdapter commentAdapter = new PdfCommentAdapter(this, commentList);
+        commentListView.setAdapter(commentAdapter);
+
+        commentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                PdfComment pdfComment = (PdfComment) adapterView.getAdapter().getItem(i);
+                RelativeLayout pageView = (RelativeLayout) pdfPageListView.getChildAt(0);
+                PhotoView pagePictureView = (PhotoView) pageView.getChildAt(0);
+                ShowRectView showRectView = (ShowRectView) pageView.getChildAt(2);
+
+                int height = pagePictureView.getDrawable().getIntrinsicHeight();
+                int width = pagePictureView.getDrawable().getIntrinsicWidth();
+
+                Matrix m = new Matrix();
+                pagePictureView.getDisplayMatrix(m);
+                m.preScale(width, height);
+
+                RectF rectF = new RectF(pdfComment.rectF);
+                m.mapRect(rectF);
+                Rect rect = new Rect();
+                rectF.round(rect);
+
+                Log.i("ShowRect", rect.toShortString());
+
+                showRectView.setRect(rect);
+            }
+        });
+
+        commentListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                
+                return false;
+            }
+        });
+
+
+        commentList.add(ru.spbau.lecturenotes.temp.PdfComment.get());
+        commentList.add(ru.spbau.lecturenotes.temp.PdfComment.get());
+        commentList.add(ru.spbau.lecturenotes.temp.PdfComment.get());
     }
 
     private boolean isInCommentMode;
@@ -82,50 +134,27 @@ public class PdfActivity extends AppCompatActivity {
     }
 
     public void onClickButtonSendComment(View view) {
-        EditText editText = (EditText) findViewById(R.id.editTextComment);
-//        CommentBuilder commentBuilder = new CommentBuilder("anon", editText.getText().toString());
+        EditText editText = findViewById(R.id.editTextComment);
 
-//        ImageView imageView = (ImageView) findViewById(R.id.justImage);
-        PhotoView photoView = (PhotoView) findViewById(R.id.photoView);
-        DragRectView dragRect = (DragRectView) findViewById(R.id.dragRect);
+        PhotoView photoView = findViewById(R.id.photoView);
+        DragRectView dragRect = findViewById(R.id.dragRect);
 
-        Log.i("image", "CurrentRect");
-        Log.i("image", currentRect.toShortString());
+        PdfComment comment = new PdfComment();
+        comment.text = editText.getText().toString();
 
-        Log.i("image", "getMatrix");
-        tryMatrix(photoView.getMatrix());
+        int height = photoView.getDrawable().getIntrinsicHeight();
+        int width = photoView.getDrawable().getIntrinsicWidth();
 
-        Log.i("image", "getImageMatrix");
-        tryMatrix(photoView.getImageMatrix());
+        RectF rectF = new RectF(dragRect.getCurrentRect());
 
-        Matrix matrix = new Matrix();
+        Matrix m = new Matrix();
+        photoView.getDisplayMatrix(m);
+        m.invert(m);
+        m.postScale((float) 1.0 / width, (float) 1.0 / height);
 
-        Log.i("image", "getDisplayMatrix");
-        photoView.getDisplayMatrix(matrix);
-        tryMatrix(matrix);
-
-        Log.i("image", "getSuppMatrix");
-        photoView.getSuppMatrix(matrix);
-        tryMatrix(matrix);
-    }
-
-    private void tryMatrix(Matrix matrix) {
-        RectF result1 = new RectF(currentRect);
-        RectF result2 = new RectF(currentRect);
-
-        Matrix inverse = new Matrix();
-        matrix.invert(inverse);
-
-        matrix.mapRect(result1);
-        inverse.mapRect(result2);
-
-        Log.i("image", round(result1).toShortString());
-        Log.i("image", round(result2).toShortString());
-    }
-
-    private Rect round(RectF rectF) {
-        Rect rect = new Rect();
-        rectF.round(rect);
-        return rect;
+        m.mapRect(rectF);
+        comment.rectF = rectF;
+        comment.text = rectF.toShortString();
+        commentList.add(comment);
     }
 }

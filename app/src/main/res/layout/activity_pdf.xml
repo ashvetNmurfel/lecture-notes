@@ -24,12 +24,6 @@
             android:layout_height="match_parent"
             android:src="@drawable/term1_algebra_05"/>
 
-        <!--<ImageView-->
-        <!--android:id="@+id/justImage"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:src="@drawable/term1_algebra_05" />-->
-
         <ru.spbau.lecturenotes.uiElements.PdfViewer.DragRectView
             android:id="@+id/dragRect"
             android:layout_width="wrap_content"
