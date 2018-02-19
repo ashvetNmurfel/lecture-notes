@@ -2,6 +2,7 @@ package ru.spbau.lecturenotes.storage.firebase;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.spbau.lecturenotes.storage.Attachment;
@@ -63,10 +64,10 @@ public class FirebaseObjectsConvertor {
     }
 
     private static CommentContent toCommentContent(FirebaseCommentContent content) {
-        Attachment[] attachments = new Attachment[content.getAttachments().length];
-        for (int i = 0; i < content.getAttachments().length; i++) {
-            FirebaseAttachment firebaseAttachment = content.getAttachments()[i];
-            attachments[i] = FirebaseObjectsConvertor.toAttachment(firebaseAttachment);
+        ArrayList<Attachment> attachments = new ArrayList<>();
+        for (int i = 0; i < content.getAttachments().size(); i++) {
+            FirebaseAttachment firebaseAttachment = content.getAttachments().get(i);
+            attachments.add(FirebaseObjectsConvertor.toAttachment(firebaseAttachment));
         }
         return new CommentContent(content.getText(), attachments);
     }

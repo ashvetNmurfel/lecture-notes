@@ -8,11 +8,11 @@ import java.util.List;
 
 public class CommentSketch {
     protected String text;
-    protected List<AttachmentSketch> attachments;
+    protected ArrayList<AttachmentSketch> attachments;
 
     public CommentSketch(@NotNull String text, @NotNull List<AttachmentSketch> attachments) {
         this.text = text;
-        this.attachments = attachments;
+        this.attachments = new ArrayList<>(attachments);
     }
 
     public CommentSketch(@NotNull String text) {
@@ -30,7 +30,7 @@ public class CommentSketch {
     }
 
     @NotNull
-    public List<AttachmentSketch> getAttachments() {
+    public ArrayList<AttachmentSketch> getAttachments() {
         return attachments;
     }
 }

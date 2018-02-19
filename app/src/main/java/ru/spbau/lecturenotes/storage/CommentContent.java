@@ -1,10 +1,12 @@
 package ru.spbau.lecturenotes.storage;
 
+import java.util.ArrayList;
+
 public class CommentContent {
     protected String text;
-    protected Attachment[] attachments;
+    protected ArrayList<Attachment> attachments;
 
-    public CommentContent(String text, Attachment[] attachments) {
+    public CommentContent(String text, ArrayList<Attachment> attachments) {
         this.text = text;
         this.attachments = attachments;
     }
@@ -13,7 +15,7 @@ public class CommentContent {
         return text;
     }
 
-    public Attachment[] getAttachments() {
+    public ArrayList<Attachment> getAttachments() {
         return attachments;
     }
 }

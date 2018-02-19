@@ -263,6 +263,7 @@ public class FirebaseProxy implements DatabaseInterface {
             if (task.isSuccessful()) {
                 final List<K> result = new ArrayList<>();
                 for (DocumentSnapshot document : task.getResult()) {
+                    Log.i("Debug", document == null ? "fuck" : "that's fine");
                     result.add(mapper.apply(document.toObject(clazz)));
                 }
                 listener.onResult(result);
@@ -422,6 +423,7 @@ public class FirebaseProxy implements DatabaseInterface {
         comment.author = new User(auth.getUid());
         comment.creationTimestamp = null;
         comment.editTimestamp = null;
+        comment.content = new FirebaseCommentContent();
         comment.content.text = request.getComment().getText();
         new AttachmentUploaderListener(comment, docRef, request.getComment().getAttachments(), listener).uploadNextAttachment();
     }
@@ -431,7 +433,7 @@ public class FirebaseProxy implements DatabaseInterface {
         protected DocumentReference docRef;
         protected List<AttachmentSketch> attachments;
         protected ResultListener<Discussion> listener;
-        protected List<FirebaseAttachment> uploadedAttachments = new ArrayList<>();
+        protected ArrayList<FirebaseAttachment> uploadedAttachments = new ArrayList<>();
 
         public AttachmentUploaderListener(FirebaseComment comment,
                                           DocumentReference docRef,
@@ -445,7 +447,7 @@ public class FirebaseProxy implements DatabaseInterface {
 
         public void uploadNextAttachment() {
             if (attachments.size() == uploadedAttachments.size()) {
-                comment.content.attachments = uploadedAttachments.toArray(new FirebaseAttachment[attachments.size()]);
+                comment.content.attachments = uploadedAttachments;
                 docRef.set(comment).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

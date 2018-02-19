@@ -3,25 +3,9 @@ package ru.spbau.lecturenotes.storage;
 import android.graphics.Point;
 
 public class Rectangle {
-    protected Point leftUpperCorner;
-    protected Point rightLowerCorner;
-    protected Point rightUpperCorner;
-    protected Point leftLowerCorner;
+    protected int number;
 
-    public Point getRightUpperCorner() {
-        return rightUpperCorner;
+    public int getNumber() {
+        return number;
     }
-
-    public Point getLeftLowerCorner() {
-        return leftLowerCorner;
-    }
-
-    public Point getLeftUpperCorner() {
-        return leftUpperCorner;
-    }
-
-    public Point getRightLowerCorner() {
-        return rightLowerCorner;
-    }
-
 }

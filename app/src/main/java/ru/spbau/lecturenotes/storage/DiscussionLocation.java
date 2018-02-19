@@ -6,6 +6,10 @@ public class DiscussionLocation {
     protected int page;
     protected Rectangle rectangle;
 
+    public DiscussionLocation() {
+
+
+    }
     public DiscussionLocation(int page,
                               @Nullable Rectangle rectangle) {
         this.page = page;
