@@ -25,7 +25,7 @@ public class DragRectView extends View {
 
     private OnUpCallback mCallback = null;
 
-    private Rect currentRect = new Rect();
+    private Rect currentRect = new Rect(0,0,0,0);
 
     public Rect getCurrentRect() {
         return currentRect;

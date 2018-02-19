@@ -1,5 +1,6 @@
 package ru.spbau.lecturenotes.activities;
 
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
@@ -14,13 +15,21 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import ru.spbau.lecturenotes.R;
+import ru.spbau.lecturenotes.services.CommentSyncService;
+import ru.spbau.lecturenotes.storage.Discussion;
+import ru.spbau.lecturenotes.storage.ResultListener;
+import ru.spbau.lecturenotes.storage.firebase.FirebaseProxy;
+import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
+import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 import ru.spbau.lecturenotes.temp.PdfComment;
 import ru.spbau.lecturenotes.temp.PdfPage;
 import ru.spbau.lecturenotes.uiElements.PdfViewer.DragRectView;
@@ -29,13 +38,33 @@ import ru.spbau.lecturenotes.uiElements.PdfViewer.PdfPageAdapter;
 import ru.spbau.lecturenotes.uiElements.PdfViewer.ShowRectView;
 
 public class PdfActivity extends AppCompatActivity {
-    private ArrayList<ru.spbau.lecturenotes.temp.PdfComment> commentList = new ArrayList<>();
+    private ArrayList<PdfComment> commentList = new ArrayList<>();
     private int currentPage = 0;
+
+    private List<DiscussionId> discussionIdList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf);
+
+        DocumentId documentId = (DocumentId) getIntent().getExtras().get("documentId");
+        setTitle(documentId.getFilename());
+
+        CommentSyncService commentSyncService = new CommentSyncService(FirebaseProxy.getInstance());
+        commentSyncService.listenToDiscussionList(documentId, new ResultListener<List<DiscussionId>>() {
+            @Override
+            public void onResult(List<DiscussionId> result) {
+                discussionIdList = result;
+            }
+
+            @Override
+            public void onError(Throwable error) {
+            }
+        });
+
+        
+
 
         ArrayList<PdfPage> pageArrayList = new ArrayList<>(Arrays.asList(new PdfPage(), new PdfPage(), new PdfPage()));
 
@@ -50,7 +79,11 @@ public class PdfActivity extends AppCompatActivity {
 
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                currentPage = firstVisibleItem;
+                if (currentPage != firstVisibleItem) {
+                    Log.i("pdf", "currentPage " + firstVisibleItem);
+                    currentPage = firstVisibleItem;
+                    onPageChange();
+                }
             }
         });
 
@@ -96,6 +129,11 @@ public class PdfActivity extends AppCompatActivity {
         commentList.add(ru.spbau.lecturenotes.temp.PdfComment.get());
         commentList.add(ru.spbau.lecturenotes.temp.PdfComment.get());
     }
+
+    private void onPageChange() {
+
+    }
+
 
     private boolean isInCommentMode;
 

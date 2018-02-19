@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -79,24 +80,9 @@ public class DocumentListActivity extends AppCompatActivity {
                 new Consumer<DocumentId>() {
             @Override
             public void accept(DocumentId documentId) {
-                //Todo: delete toast v
-                Toast.makeText(getApplicationContext(), documentId.getFilename(), Toast.LENGTH_LONG).show();
-                downloadingProgressBar.setVisibility(View.VISIBLE);
-                /*MainMenuController.onGetDocumentList(groupId, new ResultListener<List<DocumentId>>() {
-                    @Override
-                    public void onResult(List<DocumentId> documentIds) {
-                        Intent intent = new Intent(DocumentListActivity.this, DocumentListActivity.class);
-                        intent.putExtra("DOCUMENTS", (Serializable) documentIds);
-                        downloadingProgressBar.setVisibility(View.GONE);
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        downloadingProgressBar.setVisibility(View.GONE);
-                        Toast.makeText(getApplicationContext(), "Failed to load data. Please, try again", Toast.LENGTH_LONG).show();
-                    }
-                }); */
+                Intent intent = new Intent(DocumentListActivity.this, PdfActivity.class);
+                intent.putExtra("documentId", documentId);
+                startActivity(intent);
             }
         });
         documents_list.setAdapter(adapter);
