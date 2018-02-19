@@ -1,6 +1,7 @@
 package ru.spbau.lecturenotes.storage.firebase;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,6 +26,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -217,7 +220,6 @@ public class FirebaseProxy implements DatabaseInterface {
         protected List<K> result = new ArrayList<>();
         protected ResultListener<List<K>> listener;
         protected BiConsumer<C, ResultListener<K>> downloader;
-
         public LoadListListener(List<C> input,
                                 ResultListener<List<K>> listener,
                                 BiConsumer<C, ResultListener<K>> downloader) {
@@ -225,7 +227,6 @@ public class FirebaseProxy implements DatabaseInterface {
             this.listener = listener;
             this.downloader = downloader;
         }
-
         public void downloadNextItem() {
             if (input.size() == result.size()) {
                 listener.onResult(result);
@@ -234,13 +235,11 @@ public class FirebaseProxy implements DatabaseInterface {
             C nextItem = input.get(result.size());
             downloader.accept(nextItem, this);
         }
-
         @Override
         public void onResult(K result) {
             this.result.add(result);
             downloadNextItem();
         }
-
         @Override
         public void onError(Throwable error) {
             listener.onError(error);
@@ -480,8 +479,11 @@ public class FirebaseProxy implements DatabaseInterface {
 
     @Override
     public void addAttachment(final NewAttachmentRequest request, final @NotNull ResultListener<Attachment> listener) {
-        final String attachmentPath = "attachments/" + request.getCommentId().getGroupId().getKey() +
-                FirebaseAuth.getInstance().getUid() + "/" + UUID.randomUUID();
+        final String attachmentPath = TextUtils.join("/",
+                Arrays.asList("attachments",
+                        request.getCommentId().getGroupId().getKey(),
+                        FirebaseAuth.getInstance().getUid(),
+                        UUID.randomUUID().toString()));
         StorageReference storageReference = storage.getReference();
         final StorageReference attachmentReference = storageReference.child(attachmentPath);
         FileInputStream inputStream = null;
