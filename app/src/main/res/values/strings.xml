@@ -13,4 +13,5 @@
     <string name="title_activity_pdf_viewer">Конспект</string>
     <string name="in_zooming_mode">In Zoom Mode</string>
     <string name="in_selecting_rect_mode">In Select Rect Mode</string>
+    <string name="CommentIsLoading">Loading...</string>
 </resources>

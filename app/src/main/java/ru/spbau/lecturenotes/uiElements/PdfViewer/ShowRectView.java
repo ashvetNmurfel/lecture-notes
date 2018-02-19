@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -40,7 +41,7 @@ public class ShowRectView extends View {
         canvas.drawRect(rect, mRectPaint);
     }
 
-    public void setRect(Rect rect) {
+    public void setRect(@NonNull Rect rect) {
         this.rect = rect;
         invalidate();
     }

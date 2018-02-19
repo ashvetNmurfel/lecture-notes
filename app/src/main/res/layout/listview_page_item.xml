@@ -9,11 +9,6 @@
         android:layout_height="wrap_content"
         android:src="@drawable/term1_algebra_05" />
 
-    <ru.spbau.lecturenotes.uiElements.PdfViewer.DragRectView
-        android:id="@+id/dragRectItem"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
     <ru.spbau.lecturenotes.uiElements.PdfViewer.ShowRectView
         android:id="@+id/showRectViewItem"
         android:layout_width="match_parent"
