@@ -9,11 +9,16 @@ import java.util.List;
 import ru.spbau.lecturenotes.storage.Comment;
 import ru.spbau.lecturenotes.storage.DatabaseInterface;
 import ru.spbau.lecturenotes.storage.Discussion;
+import ru.spbau.lecturenotes.storage.Document;
 import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
+import ru.spbau.lecturenotes.storage.requests.AddCommentRequest;
+import ru.spbau.lecturenotes.storage.requests.CommentSketch;
+import ru.spbau.lecturenotes.storage.requests.DiscussionSketch;
+import ru.spbau.lecturenotes.storage.requests.NewDiscussionRequest;
 
 public class CommentSyncService {
     private static final String TAG = "CommentSyncService";
@@ -44,6 +49,16 @@ public class CommentSyncService {
             @NotNull List<CommentId> commentIds,
             @NotNull ResultListener<List<Comment>> listener) {
         db.getCommentsList(commentIds, listener);
+    }
+
+    public void addComment(@NotNull DiscussionId discussion, @NotNull CommentSketch sketch,
+                           @NotNull ResultListener<Discussion> listener) {
+        db.addComment(new AddCommentRequest(discussion, sketch), listener);
+    }
+
+    public void addDiscussion(@NotNull DocumentId document, @NotNull DiscussionSketch sketch,
+                              @NotNull ResultListener<Discussion> listener) {
+        db.addDiscussion(new NewDiscussionRequest(document, sketch), listener);
     }
 
     public ListenerController listenToCommentList(
