@@ -1,6 +1,7 @@
 package ru.spbau.lecturenotes.storage.firebase;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -15,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -25,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -37,6 +40,7 @@ import ru.spbau.lecturenotes.storage.Discussion;
 import ru.spbau.lecturenotes.storage.DiscussionStatus;
 import ru.spbau.lecturenotes.storage.Document;
 import ru.spbau.lecturenotes.storage.ListenerController;
+import ru.spbau.lecturenotes.storage.LocalFile;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.User;
 import ru.spbau.lecturenotes.storage.UserInfo;
@@ -50,9 +54,8 @@ import ru.spbau.lecturenotes.storage.requests.AttachmentSketch;
 import ru.spbau.lecturenotes.storage.requests.NewAttachmentRequest;
 import ru.spbau.lecturenotes.storage.requests.NewDiscussionRequest;
 
-import static android.content.ContentValues.TAG;
-
 public class FirebaseProxy implements DatabaseInterface {
+    private static final String TAG = "FirebaseProxy";
     protected static FirebaseProxy INSTANCE = new FirebaseProxy();
     protected FirebaseFirestore db = FirebaseFirestore.getInstance();
     protected FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -217,7 +220,6 @@ public class FirebaseProxy implements DatabaseInterface {
         protected List<K> result = new ArrayList<>();
         protected ResultListener<List<K>> listener;
         protected BiConsumer<C, ResultListener<K>> downloader;
-
         public LoadListListener(List<C> input,
                                 ResultListener<List<K>> listener,
                                 BiConsumer<C, ResultListener<K>> downloader) {
@@ -225,7 +227,6 @@ public class FirebaseProxy implements DatabaseInterface {
             this.listener = listener;
             this.downloader = downloader;
         }
-
         public void downloadNextItem() {
             if (input.size() == result.size()) {
                 listener.onResult(result);
@@ -234,13 +235,11 @@ public class FirebaseProxy implements DatabaseInterface {
             C nextItem = input.get(result.size());
             downloader.accept(nextItem, this);
         }
-
         @Override
         public void onResult(K result) {
             this.result.add(result);
             downloadNextItem();
         }
-
         @Override
         public void onError(Throwable error) {
             listener.onError(error);
@@ -482,8 +481,11 @@ public class FirebaseProxy implements DatabaseInterface {
 
     @Override
     public void addAttachment(final NewAttachmentRequest request, final @NotNull ResultListener<Attachment> listener) {
-        final String attachmentPath = "attachments/" + request.getCommentId().getGroupId().getKey() +
-                FirebaseAuth.getInstance().getUid() + "/" + UUID.randomUUID();
+        final String attachmentPath = TextUtils.join("/",
+                Arrays.asList("attachments",
+                        request.getCommentId().getGroupId().getKey(),
+                        FirebaseAuth.getInstance().getUid(),
+                        UUID.randomUUID().toString()));
         StorageReference storageReference = storage.getReference();
         final StorageReference attachmentReference = storageReference.child(attachmentPath);
         FileInputStream inputStream = null;
@@ -539,6 +541,47 @@ public class FirebaseProxy implements DatabaseInterface {
             }
         });
     }
+
+    @Override
+    public void getAttachmentContent(final Attachment attachment, final File file,
+                                     final ResultListener<LocalFile<AttachmentId>> listener) {
+        Log.i(TAG, "Preparing to download Attachment file: " + attachment.getReference());
+        StorageReference attachmentReference = storage.getReference(attachment.getReference());
+        attachmentReference.getFile(file).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, "Failed to download attachment from reference " + attachment.getReference(), e);
+                  listener.onError(e);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                Log.i(TAG, "Attachment " + attachment.getReference() + " was downloaded");
+                listener.onResult(new LocalFile<>(attachment.getAttachmentId(), file));
+            }
+        });
+    }
+
+    @Override
+    public void getDocumentFile(final Document document, final File file,
+                                final ResultListener<LocalFile<DocumentId>> listener) {
+        Log.i(TAG, "Preparing to download Document file: " + document.getReference());
+        StorageReference documentReference = storage.getReference(document.getReference().getStorageReference());
+        documentReference.getFile(file).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, "Failed to download document from reference " + document.getReference(), e);
+                listener.onError(e);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                Log.i(TAG, "Document " + document.getReference() + " was downloaded");
+                listener.onResult(new LocalFile<>(document.getId(), file));
+            }
+        });
+    }
+
 
     @Override
     public ListenerController setDocumentListListener(final @NotNull GroupId group,

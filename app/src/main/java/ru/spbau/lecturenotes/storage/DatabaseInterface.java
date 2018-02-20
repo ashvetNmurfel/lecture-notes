@@ -1,5 +1,6 @@
 package ru.spbau.lecturenotes.storage;
 
+import java.io.File;
 import java.util.List;
 
 import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
@@ -43,15 +44,19 @@ public interface DatabaseInterface {
 
     void addAttachment(NewAttachmentRequest request, ResultListener<Attachment> listener);
 
+    void getAttachmentContent(Attachment attachment, File file, ResultListener<LocalFile<AttachmentId>> listener);
+
+    void getDocumentFile(Document document, File file, ResultListener<LocalFile<DocumentId>> listener);
+
     ListenerController setDocumentListListener(GroupId group, DocumentListChangeListener listener);
 
     ListenerController setGroupsListListener(GroupListChangeListener listener);
 
-    public ListenerController setDiscussionsListListener(DocumentId document, DiscussionListListener listener);
+    ListenerController setDiscussionsListListener(DocumentId document, DiscussionListListener listener);
 
-    public ListenerController setCommentsListListener(DiscussionId discussion, CommentListListener listener);
+    ListenerController setCommentsListListener(DiscussionId discussion, CommentListListener listener);
 
-    public UserInfo getUserInfo();
+    UserInfo getUserInfo();
 
     interface DocumentListChangeListener {
         void onDocumentListUpdated(GroupId id);
