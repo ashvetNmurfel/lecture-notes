@@ -23,7 +23,7 @@ public class DiscussionId implements Serializable {
     }
 
     @NotNull
-    public GroupId getGroupId() {
+    public GroupId groupId() {
         return documentId.getGroupId();
     }
 

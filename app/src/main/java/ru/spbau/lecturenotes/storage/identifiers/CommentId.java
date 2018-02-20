@@ -23,12 +23,12 @@ public class CommentId implements Serializable {
     }
 
     @NotNull
-    public GroupId getGroupId() {
-        return discussionId.getGroupId();
+    public GroupId groupId() {
+        return discussionId.groupId();
     }
 
     @NotNull
-    public DocumentId getDocumentId() {
+    public DocumentId documentId() {
         return discussionId.getDocumentId();
     }
 

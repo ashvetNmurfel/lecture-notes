@@ -483,7 +483,7 @@ public class FirebaseProxy implements DatabaseInterface {
     public void addAttachment(final NewAttachmentRequest request, final @NotNull ResultListener<Attachment> listener) {
         final String attachmentPath = TextUtils.join("/",
                 Arrays.asList("attachments",
-                        request.getCommentId().getGroupId().getKey(),
+                        request.getCommentId().groupId().getKey(),
                         FirebaseAuth.getInstance().getUid(),
                         UUID.randomUUID().toString()));
         StorageReference storageReference = storage.getReference();

@@ -22,18 +22,18 @@ public class AttachmentId implements Serializable {
     }
 
     @NotNull
-    public DiscussionId getDiscussionId() {
+    public DiscussionId discussionId() {
         return commentId.getDiscussionId();
     }
 
     @NotNull
-    public GroupId getGroupId() {
-        return commentId.getGroupId();
+    public GroupId groupId() {
+        return commentId.groupId();
     }
 
     @NotNull
-    public DocumentId getDocumentId() {
-        return commentId.getDocumentId();
+    public DocumentId documentId() {
+        return commentId.documentId();
     }
 
     @NotNull

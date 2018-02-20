@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
-import ru.spbau.lecturenotes.storage.Comment;
 import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.User;
 
@@ -17,7 +16,7 @@ public class FirebaseComment {
     protected User author;
     @ServerTimestamp
     protected Date creationTimestamp;
-    protected boolean isEdited;
+    protected boolean edited;
     @ServerTimestamp
     protected Date editTimestamp;
 
@@ -51,7 +50,7 @@ public class FirebaseComment {
     }
 
     public boolean isEdited() {
-        return isEdited;
+        return edited;
     }
 
     @NotNull
