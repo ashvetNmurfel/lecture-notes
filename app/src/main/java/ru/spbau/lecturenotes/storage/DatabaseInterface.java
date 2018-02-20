@@ -44,9 +44,9 @@ public interface DatabaseInterface {
 
     void addAttachment(NewAttachmentRequest request, ResultListener<Attachment> listener);
 
-    void getAttachmentContent(Attachment attachment, File file, ResultListener<Void> listener);
+    void getAttachmentContent(Attachment attachment, File file, ResultListener<LocalFile<AttachmentId>> listener);
 
-    void getDocumentFile(Document document, File file, ResultListener<Void> listener);
+    void getDocumentFile(Document document, File file, ResultListener<LocalFile<DocumentId>> listener);
 
     ListenerController setDocumentListListener(GroupId group, DocumentListChangeListener listener);
 
