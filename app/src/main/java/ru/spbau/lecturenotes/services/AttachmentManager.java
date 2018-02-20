@@ -27,7 +27,7 @@ import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
 
 public class AttachmentManager implements FileManagerInterface<AttachmentId, Attachment>, Serializable {
-    private static final String TAG = "FileManager";
+    private static final String TAG = "AttachmentManager";
     private static final String PATH =  "attachments_records";
     protected static final AttachmentManager INSTANCE;
     private int version = 0;
@@ -64,11 +64,15 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
         List<File> filesToBeRemoved = new ArrayList<>();
         for (AttachmentId attachment : INSTANCE.downloadingFiles) {
             filesToBeRemoved.add(INSTANCE.descriptors.get(attachment));
-            INSTANCE.descriptors.remove(attachment);
         }
+        for (AttachmentId attachment : INSTANCE.downloadedFiles) {
+            filesToBeRemoved.add(INSTANCE.descriptors.get(attachment));
+        }
+        INSTANCE.descriptors = new HashMap<>();
         INSTANCE.downloadingFiles = new HashSet<>();
-
+        INSTANCE.downloadedFiles = new HashSet<>();
         new FileRemover().execute(filesToBeRemoved.toArray(new File[filesToBeRemoved.size()]));
+        INSTANCE.saveSelf();
     }
 
     AttachmentManager getInstance() {
@@ -82,7 +86,6 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
         downloadingFiles= new HashSet<>();
         descriptors = new HashMap<>();
         onAttachmentDownloaded = new HashMap<>();
-        saveSelf();
     }
 
     @Override
@@ -112,6 +115,7 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
                         onAttachmentDownloaded.get(id)) {
                     localFileResultListener.onResult(result);
                 }
+                onAttachmentDownloaded.remove(id);
             }
 
             @Override
@@ -120,6 +124,8 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
                         onAttachmentDownloaded.get(id)) {
                     localFileResultListener.onError(error);
                 }
+                onAttachmentDownloaded.remove(id);
+                INSTANCE.saveSelf();
             }
         });
     }
@@ -148,6 +154,7 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
         @Override
         protected void onPreExecute() {
             saveInProgress = true;
+            INSTANCE.recordedAt = 1 - INSTANCE.recordedAt;
         }
 
         @Override
@@ -164,7 +171,7 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
                     if (stream != null)
                     stream.close();
                 } catch (IOException e) {
-                    Log.e(TAG, "Failed to catch stream", e);
+                    Log.e(TAG, "Failed to close stream", e);
                 }
             }
             return null;
@@ -172,7 +179,6 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
         @Override
         protected void onPostExecute(Void v) {
             saveInProgress = false;
-            INSTANCE.recordedAt = 1 - INSTANCE.recordedAt;
             if (needSync) {
                 needSync = false;
                 new SelfWriter().execute();
