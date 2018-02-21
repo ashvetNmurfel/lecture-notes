@@ -9,16 +9,19 @@ public class DocumentId implements Serializable {
     protected GroupId groupId;
     protected String key;
     protected String filename;
+    protected String description;
 
     public DocumentId() {
     }
 
     public DocumentId(@NotNull final GroupId groupId,
                       @NotNull final String key,
-                      @NotNull final String filename) {
+                      @NotNull final String filename,
+                      @NotNull final String description) {
         this.groupId = groupId;
         this.key = key;
         this.filename = filename;
+        this.description = description;
     }
 
     @NotNull
@@ -34,6 +37,10 @@ public class DocumentId implements Serializable {
     @NotNull
     public String getFilename() {
         return filename;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     @Override
