@@ -1,5 +1,6 @@
 package ru.spbau.lecturenotes.services;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,7 +30,8 @@ import ru.spbau.lecturenotes.storage.identifiers.AttachmentId;
 public class AttachmentManager implements FileManagerInterface<AttachmentId, Attachment>, Serializable {
     private static final String TAG = "AttachmentManager";
     private static final String PATH =  "attachments_records";
-    protected static final AttachmentManager INSTANCE;
+    protected static AttachmentManager INSTANCE;
+    protected Context context;
     private int version = 0;
     private int recordedAt = 0;
 
@@ -38,17 +40,17 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
     private HashSet<AttachmentId> downloadedFiles;
     private HashSet<AttachmentId> downloadingFiles;
 
-    static {
+    static AttachmentManager initInstance(Context context) {
         AttachmentManager am1 = null;
         AttachmentManager am2 = null;
 
         try {
-            am1 = new SelfDownloader().execute(PATH + "0").get();
+            am1 = new SelfDownloader().execute(context.getFilesDir().getAbsolutePath() + PATH + "0").get();
         } catch (InterruptedException | ExecutionException e) {
             Log.wtf(TAG, "Couldn't get AttachmentManager#0", e);
         }
         try {
-            am2 = new SelfDownloader().execute(PATH + "1").get();
+            am2 = new SelfDownloader().execute(context.getFilesDir().getAbsolutePath() + PATH + "1").get();
         } catch (InterruptedException | ExecutionException e) {
             Log.wtf(TAG, "Couldn't get AttachmentManager#1", e);
         }
@@ -71,8 +73,10 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
         INSTANCE.descriptors = new HashMap<>();
         INSTANCE.downloadingFiles = new HashSet<>();
         INSTANCE.downloadedFiles = new HashSet<>();
+        INSTANCE.context = context;
         new FileRemover().execute(filesToBeRemoved.toArray(new File[filesToBeRemoved.size()]));
         INSTANCE.saveSelf();
+        return INSTANCE;
     }
 
     AttachmentManager getInstance() {
@@ -130,8 +134,14 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
         });
     }
 
+    private File getFile(String path) {
+        File file = new File(INSTANCE.context.getFilesDir(), path);
+        file.mkdirs();
+        return file;
+    }
+
     private File generateAttachmentFile(AttachmentId id) {
-        return new File(TextUtils.join(File.separator, Arrays.asList("attachments", UUID.randomUUID())));
+        return getFile(TextUtils.join(File.separator, Arrays.asList("attachments", UUID.randomUUID())));
     }
 
     private void attachCallback(AttachmentId id, ResultListener<LocalFile<AttachmentId>> listener) {
@@ -159,7 +169,7 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
 
         @Override
         protected Void doInBackground(Void... voids) {
-            File file = new File(AttachmentManager.PATH + Integer.toString(INSTANCE.recordedAt));
+            File file = INSTANCE.getFile(AttachmentManager.PATH + Integer.toString(INSTANCE.recordedAt));
             ObjectOutputStream stream = null;
             try {
                 stream = new ObjectOutputStream(new FileOutputStream(file));
