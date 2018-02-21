@@ -1,8 +1,10 @@
 package ru.spbau.lecturenotes.activities;
 
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,6 +21,9 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.github.chrisbanes.photoview.PhotoView;
+
+import org.vudroid.core.DecodeServiceBase;
+import org.vudroid.pdfdroid.codec.PdfContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,10 +53,15 @@ public class PdfActivity extends AppCompatActivity {
     private int currentPage = 0;
     private List<DiscussionId> discussionIdList = new ArrayList<>();
 
+    private ListView commentListView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf);
+
+        commentListView = findViewById(R.id.commentsList);
+        Log.i("onCreate", commentListView.toString());
 
         documentId = (DocumentId) getIntent().getExtras().get("documentId");
         setTitle(documentId.getFilename());
@@ -90,7 +100,9 @@ public class PdfActivity extends AppCompatActivity {
             }
         });
 
-        final ListView commentListView = findViewById(R.id.commentsList);
+//        pdfPageAdapter.notifyDataSetChanged();
+
+
         commentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -118,9 +130,9 @@ public class PdfActivity extends AppCompatActivity {
         });
     }
 
-    private void setDiscussionListForCurrentPage() {
-        final ListView commentListView = findViewById(R.id.commentsList);
 
+
+    private void setDiscussionListForCurrentPage() {
         List<DiscussionId> currentPageDiscussionIdList = new ArrayList<>();
         for (DiscussionId discussionId : discussionIdList) {
             if (discussionId.getLocation().getPage() == currentPage) {
@@ -129,6 +141,7 @@ public class PdfActivity extends AppCompatActivity {
         }
 
         PdfCommentAdapter commentAdapter = new PdfCommentAdapter(PdfActivity.this, currentPageDiscussionIdList);
+        Log.i("setDiscussionListForCurrentPage", commentListView.toString());
         commentListView.setAdapter(commentAdapter);
 
         for (int k = 0; k < currentPageDiscussionIdList.size(); k++) {
@@ -142,6 +155,7 @@ public class PdfActivity extends AppCompatActivity {
                         return;
                     }
                     Comment comment = result.get(0);
+                    Log.i("setDiscussionListForCurrentPage listenToCommentList onResult", commentListView.toString());
                     LinearLayout linearLayout = (LinearLayout) commentListView.getChildAt(i);
                     TextView textView = (TextView) linearLayout.getChildAt(0);
                     textView.setText(comment.getContent().getText());
@@ -156,7 +170,8 @@ public class PdfActivity extends AppCompatActivity {
     }
 
     private void onPageChange() {
-
+        setTitle(documentId.getFilename() + " - " + (currentPage + 1));
+        setDiscussionListForCurrentPage();
     }
 
 
