@@ -56,6 +56,7 @@ public class MainMenuActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
+        setTitle("Select Group");
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -199,30 +200,6 @@ public class MainMenuActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Toast.makeText(getApplicationContext(),
-                    "Do you like settings?",
-                    Toast.LENGTH_LONG).show();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -235,9 +212,8 @@ public class MainMenuActivity extends AppCompatActivity
                     "To use this application further, you should be signed in",
                     Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_settings) {
-            Toast.makeText(getApplicationContext(),
-                    "Cool! I also love settings!",
-                    Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(MainMenuActivity.this, SettingsActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

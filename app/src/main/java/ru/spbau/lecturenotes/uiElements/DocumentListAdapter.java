@@ -58,7 +58,7 @@ public class DocumentListAdapter extends ArrayAdapter<DocumentId> {
 
         holder.document = documents.get(position);
         holder.nameTextField.setText(holder.document.getFilename());
-        holder.infoTextField.setText(holder.document.getKey());
+        holder.infoTextField.setText(holder.document.getDescription());
 
         return view;
     }

@@ -23,6 +23,7 @@ android {
 
 dependencies {
 //    annotationProcessor 'com.google.dagger:dagger-compiler:+'
+    implementation 'com.android.support:support-v4:26.1.0'
     annotationProcessor 'org.androidannotations:androidannotations:4.0.0'
     compile 'com.google.firebase:firebase-firestore:11.8.0'
     compile 'com.google.firebase:firebase-storage:11.8.0'
@@ -43,6 +44,7 @@ dependencies {
     compile 'org.jetbrains:annotations-java5:15.0'
     compile 'com.github.chrisbanes:PhotoView:+'
 }
+
 
 
 

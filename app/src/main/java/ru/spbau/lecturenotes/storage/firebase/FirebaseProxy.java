@@ -441,7 +441,8 @@ public class FirebaseProxy implements DatabaseInterface {
                 firebaseDocument.id = new DocumentId(
                         request.getGroup(),
                         docRef.getId(),
-                        request.getSketch().getFilename());
+                        request.getSketch().getFilename(),
+                        request.getSketch().getDescription());
                 firebaseDocument.reference = new FirebaseDocumentDataReference();
                 firebaseDocument.reference.storageReference = documentPath;
                 firebaseDocument.reference.type = "PDF";
