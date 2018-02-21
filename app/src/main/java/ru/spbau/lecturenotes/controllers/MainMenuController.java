@@ -4,7 +4,12 @@ import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import ru.spbau.lecturenotes.services.MetadataSyncService;
@@ -71,7 +76,7 @@ public class MainMenuController {
             @Override
             public void onResult(List<DocumentId> result) {
                 Log.i(TAG, "List of documents was received by controller. Handling to function...");
-                consumer.accept(result);
+                consumer.accept(selectUnique(result));
             }
 
             @Override
@@ -79,6 +84,26 @@ public class MainMenuController {
                 Log.e(TAG, "Failed to load documents list into controller. Error: ", error);
             }
         });
+    }
+
+    private static List<DocumentId> selectUnique(List<DocumentId> documents) {
+        HashMap<String, DocumentId> map = new HashMap<>();
+        for (DocumentId doc : documents) {
+            if (!map.containsKey(doc.getFilename())) {
+                map.put(doc.getFilename(), doc);
+            }
+        }
+        List<DocumentId> result = new ArrayList<>();
+        for (String name : map.keySet()) {
+            result.add(map.get(name));
+        }
+        result.sort(new Comparator<DocumentId>() {
+            @Override
+            public int compare(DocumentId documentId, DocumentId t1) {
+                return documentId.getFilename().compareTo(t1.getFilename());
+            }
+        });
+        return result;
     }
 
     public static void addDocument(GroupId groupId, final DocumentSketch sketch, final ResultListener<Document> listener) {

@@ -15,6 +15,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -326,7 +327,7 @@ public class FirebaseProxy implements DatabaseInterface {
     public void getDocumentIdsList(final GroupId group, final ResultListener<List<DocumentId>> listener) {
         Log.i(TAG, "Attempting to get Document list for Group" + group.getKey());
         final CollectionReference collRef = Schema.documents(db, group);
-        collRef.orderBy("updateTimestamp").get().addOnCompleteListener(
+        collRef.orderBy("updateTimestamp", Query.Direction.DESCENDING).get().addOnCompleteListener(
             new LoadCollectionListener<>(FirebaseDocument.class, listener, new Function<FirebaseDocument, DocumentId>() {
                 @Override
                 public DocumentId apply(FirebaseDocument firebaseDocument) {
