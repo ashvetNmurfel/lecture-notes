@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -420,19 +421,12 @@ public class FirebaseProxy implements DatabaseInterface {
                         UUID.randomUUID().toString()));
         StorageReference storageReference = storage.getReference();
         final StorageReference documentReference = storageReference.child(documentPath);
-        FileInputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(request.getSketch().getPdf());
-        } catch (FileNotFoundException e) {
-            listener.onError(e);
-            return;
-        }
+        InputStream inputStream = request.getSketch().getPdf();
         documentReference.putStream(inputStream)
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "Could not upload document " + request.getSketch().getPdf().getName()
-                                + " to a storage location: " + documentPath, e);
+                        Log.e(TAG, "Could not upload document to a storage location: " + documentPath, e);
                         listener.onError(e);
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -453,7 +447,7 @@ public class FirebaseProxy implements DatabaseInterface {
                 docRef.set(firebaseDocument).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "Failed to add Document for the path: " + request.getSketch().getPdf().getName(), e);
+                        Log.e(TAG, "Failed to add Document for the path: " + documentPath, e);
                         documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {

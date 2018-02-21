@@ -1,19 +1,19 @@
 package ru.spbau.lecturenotes.storage.requests;
 
-import java.io.File;
+import java.io.InputStream;
 
 public class DocumentSketch {
-    protected File pdf;
+    protected InputStream pdf;
     protected String filename;
     protected String description;
 
-    public DocumentSketch(File pdf, String filename, String description) {
+    public DocumentSketch(InputStream pdf, String filename, String description) {
         this.pdf = pdf;
         this.filename = filename;
         this.description = description;
     }
 
-    public File getPdf() {
+    public InputStream getPdf() {
         return pdf;
     }
 
