@@ -3,15 +3,16 @@
     <!-- A 'parent' preference, which enables/disables child preferences (below)
          when checked/unchecked. -->
     <SwitchPreference
-        android:key="notifications_new_message"
-        android:title="@string/pref_title_new_message_notifications"
-        android:defaultValue="true" />
+        android:defaultValue="true"
+        android:key="notifications_new_bug_reports"
+        android:summary="@string/pref_desc_new_bug_reports"
+        android:title="@string/pref_title_new_bug_reports" />
 
     <!-- Allows the user to choose a ringtone in the 'notification' category. -->
     <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
     <!-- NOTE: RingtonePreference's summary should be set to its value by the activity code. -->
     <RingtonePreference
-        android:dependency="notifications_new_message"
+        android:dependency="notifications_new_bug_reports"
         android:key="notifications_new_message_ringtone"
         android:title="@string/pref_title_ringtone"
         android:ringtoneType="notification"
@@ -19,7 +20,7 @@
 
     <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
     <SwitchPreference
-        android:dependency="notifications_new_message"
+        android:dependency="notifications_new_bug_reports"
         android:key="notifications_new_message_vibrate"
         android:title="@string/pref_title_vibrate"
         android:defaultValue="true" />
