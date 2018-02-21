@@ -45,12 +45,18 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
         AttachmentManager am2 = null;
 
         try {
-            am1 = new SelfDownloader().execute(context.getFilesDir().getAbsolutePath() + PATH + "0").get();
+            am1 = new SelfDownloader().execute(
+                    context.getFilesDir().getAbsolutePath()
+                            + File.separator
+                            + PATH + "0").get();
         } catch (InterruptedException | ExecutionException e) {
             Log.wtf(TAG, "Couldn't get AttachmentManager#0", e);
         }
         try {
-            am2 = new SelfDownloader().execute(context.getFilesDir().getAbsolutePath() + PATH + "1").get();
+            am2 = new SelfDownloader().execute(
+                    context.getFilesDir().getAbsolutePath()
+                            + File.separator
+                            + PATH + "1").get();
         } catch (InterruptedException | ExecutionException e) {
             Log.wtf(TAG, "Couldn't get AttachmentManager#1", e);
         }
