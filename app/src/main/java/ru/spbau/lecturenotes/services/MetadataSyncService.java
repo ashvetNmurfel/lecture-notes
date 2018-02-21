@@ -5,10 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import ru.spbau.lecturenotes.storage.DatabaseInterface;
+import ru.spbau.lecturenotes.storage.Document;
 import ru.spbau.lecturenotes.storage.ListenerController;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 import ru.spbau.lecturenotes.storage.identifiers.GroupId;
+import ru.spbau.lecturenotes.storage.requests.AddDocumentRequest;
+import ru.spbau.lecturenotes.storage.requests.DocumentSketch;
 
 public class MetadataSyncService {
     protected final DatabaseInterface db;
@@ -33,5 +36,11 @@ public class MetadataSyncService {
                 db.getDocumentIdsList(groupId, listener);
             }
         });
+    }
+
+    public void uploadDocument(@NotNull GroupId group,
+                               @NotNull DocumentSketch sketch,
+                               @NotNull ResultListener<Document> listener) {
+        db.addDocument(new AddDocumentRequest(sketch, group), listener);
     }
 }
