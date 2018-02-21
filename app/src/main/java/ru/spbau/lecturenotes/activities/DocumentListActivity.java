@@ -126,9 +126,8 @@ public class DocumentListActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Toast.makeText(getApplicationContext(),
-                    "Do you like settings?",
-                    Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(DocumentListActivity.this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
         if (id == R.id.action_add_document) {
