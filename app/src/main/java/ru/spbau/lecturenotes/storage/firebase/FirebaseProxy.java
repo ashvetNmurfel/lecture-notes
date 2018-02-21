@@ -15,6 +15,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +52,7 @@ import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 import ru.spbau.lecturenotes.storage.requests.AddCommentRequest;
+import ru.spbau.lecturenotes.storage.requests.AddDocumentRequest;
 import ru.spbau.lecturenotes.storage.requests.AttachmentSketch;
 import ru.spbau.lecturenotes.storage.requests.NewAttachmentRequest;
 import ru.spbau.lecturenotes.storage.requests.NewDiscussionRequest;
@@ -324,7 +327,7 @@ public class FirebaseProxy implements DatabaseInterface {
     public void getDocumentIdsList(final GroupId group, final ResultListener<List<DocumentId>> listener) {
         Log.i(TAG, "Attempting to get Document list for Group" + group.getKey());
         final CollectionReference collRef = Schema.documents(db, group);
-        collRef.orderBy("updateTimestamp").get().addOnCompleteListener(
+        collRef.orderBy("updateTimestamp", Query.Direction.DESCENDING).get().addOnCompleteListener(
             new LoadCollectionListener<>(FirebaseDocument.class, listener, new Function<FirebaseDocument, DocumentId>() {
                 @Override
                 public DocumentId apply(FirebaseDocument firebaseDocument) {
@@ -406,6 +409,66 @@ public class FirebaseProxy implements DatabaseInterface {
             public void onFailure(@NonNull Exception e) {
                 Log.e(TAG, "Failed to add a new discussionId to Document " + request.getDocumentId().getKey(), e);
                 listener.onError(e);
+            }
+        });
+    }
+
+    @Override
+    public void addDocument(final AddDocumentRequest request, final ResultListener<Document> listener) {
+        final String documentPath = TextUtils.join("/",
+                Arrays.asList("documents",
+                        request.getGroup().getKey(),
+                        FirebaseAuth.getInstance().getUid(),
+                        UUID.randomUUID().toString()));
+        StorageReference storageReference = storage.getReference();
+        final StorageReference documentReference = storageReference.child(documentPath);
+        InputStream inputStream = request.getSketch().getPdf();
+        documentReference.putStream(inputStream)
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Could not upload document to a storage location: " + documentPath, e);
+                        listener.onError(e);
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.i(TAG, "Successfully uploaded document to the storage");
+                DocumentReference docRef = Schema.documents(db, request.getGroup())
+                        .document();
+                final FirebaseDocument firebaseDocument = new FirebaseDocument();
+                firebaseDocument.updateTimestamp = null;
+                firebaseDocument.id = new DocumentId(
+                        request.getGroup(),
+                        docRef.getId(),
+                        request.getSketch().getFilename());
+                firebaseDocument.reference = new FirebaseDocumentDataReference();
+                firebaseDocument.reference.storageReference = documentPath;
+                firebaseDocument.reference.type = "PDF";
+                docRef.set(firebaseDocument).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Failed to add Document for the path: " + documentPath, e);
+                        documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.i(TAG, "Document was successfully deleted from the storage");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG, "Failed to delete Document from the storage", e);
+                            }
+                        });
+                        listener.onError(e);
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.i(TAG, "Loaded Document to the Group: " + request.getGroup().getKey());
+                        getDocument(firebaseDocument.getId(), listener);
+                    }
+                });
             }
         });
     }

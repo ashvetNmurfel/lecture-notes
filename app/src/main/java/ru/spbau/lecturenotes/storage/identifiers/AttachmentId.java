@@ -3,6 +3,7 @@ package ru.spbau.lecturenotes.storage.identifiers;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class AttachmentId implements Serializable {
     protected CommentId commentId;
@@ -40,4 +41,10 @@ public class AttachmentId implements Serializable {
     public String getKey() {
         return key;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof AttachmentId && Objects.equals(key, ((AttachmentId) o).getKey());
+    }
+
 }

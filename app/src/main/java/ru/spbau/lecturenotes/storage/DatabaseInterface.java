@@ -9,6 +9,7 @@ import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 import ru.spbau.lecturenotes.storage.requests.AddCommentRequest;
+import ru.spbau.lecturenotes.storage.requests.AddDocumentRequest;
 import ru.spbau.lecturenotes.storage.requests.NewAttachmentRequest;
 import ru.spbau.lecturenotes.storage.requests.NewDiscussionRequest;
 
@@ -39,6 +40,8 @@ public interface DatabaseInterface {
     void getDiscussionIdsList(DocumentId documentId, ResultListener<List<DiscussionId>> listener);
 
     void addDiscussion(NewDiscussionRequest request, ResultListener<Discussion> listener);
+
+    void addDocument(AddDocumentRequest request, ResultListener<Document> listener);
 
     void addComment(AddCommentRequest request /* contains DiscussionId */, ResultListener<Discussion> listener);
 

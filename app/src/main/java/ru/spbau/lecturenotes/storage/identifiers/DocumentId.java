@@ -3,6 +3,7 @@ package ru.spbau.lecturenotes.storage.identifiers;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class DocumentId implements Serializable {
     protected GroupId groupId;
@@ -33,5 +34,10 @@ public class DocumentId implements Serializable {
     @NotNull
     public String getFilename() {
         return filename;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof DocumentId && Objects.equals(key, ((DocumentId) o).getKey());
     }
 }
