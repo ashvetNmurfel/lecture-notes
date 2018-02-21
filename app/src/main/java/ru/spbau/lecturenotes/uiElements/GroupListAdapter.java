@@ -58,7 +58,7 @@ public class GroupListAdapter extends ArrayAdapter<GroupId> {
 
         holder.group = groups.get(position);
         holder.nameTextField.setText(holder.group.getName());
-        holder.infoTextField.setText(holder.group.getKey());
+        holder.infoTextField.setText(holder.group.getDescription());
 
         return view;
     }
