@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Lecture Notes</string>
+    <string name="app_name">coNotica</string>
 
     <string name="pick_file">Pick file</string>
     <string name="your_comment">Ваш комментарий</string>
-    <string name="title_activity_main_menu">Select Document</string>
+    <string name="title_activity_main_menu">coNotica</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
