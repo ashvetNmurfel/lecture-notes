@@ -235,9 +235,8 @@ public class MainMenuActivity extends AppCompatActivity
                     "To use this application further, you should be signed in",
                     Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_settings) {
-            Toast.makeText(getApplicationContext(),
-                    "Cool! I also love settings!",
-                    Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(MainMenuActivity.this, SettingsActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
