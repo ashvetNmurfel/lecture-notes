@@ -40,7 +40,7 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
     private HashSet<AttachmentId> downloadedFiles;
     private HashSet<AttachmentId> downloadingFiles;
 
-    static AttachmentManager initInstance(Context context) {
+    public static AttachmentManager initInstance(Context context) {
         AttachmentManager am1 = null;
         AttachmentManager am2 = null;
 
@@ -85,7 +85,7 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
         return INSTANCE;
     }
 
-    AttachmentManager getInstance() {
+    public AttachmentManager getInstance() {
         return INSTANCE;
     }
 

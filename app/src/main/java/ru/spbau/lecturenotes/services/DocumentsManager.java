@@ -1,5 +1,6 @@
 package ru.spbau.lecturenotes.services;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,7 +30,8 @@ import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 public class DocumentsManager implements FileManagerInterface<DocumentId, Document>, Serializable {
     private static final String TAG = "DocumentsManager";
     private static final String PATH =  "documents_records";
-    protected static final DocumentsManager INSTANCE;
+    protected static DocumentsManager INSTANCE;
+    protected Context context;
     private int version = 0;
     private int recordedAt = 0;
 
@@ -38,17 +40,19 @@ public class DocumentsManager implements FileManagerInterface<DocumentId, Docume
     private HashSet<DocumentId> downloadedFiles;
     private HashSet<DocumentId> downloadingFiles;
 
-    static {
+    static DocumentsManager initInstance(Context context) {
         DocumentsManager dm1 = null;
         DocumentsManager dm2 = null;
 
         try {
-            dm1 = new SelfDownloader().execute(PATH + "0").get();
+            dm1 = new SelfDownloader().execute(context.getFilesDir().getAbsolutePath()
+                    + File.separator + PATH + "0").get();
         } catch (InterruptedException | ExecutionException e) {
             Log.wtf(TAG, "Couldn't get DownloadManager#0", e);
         }
         try {
-            dm2 = new SelfDownloader().execute(PATH + "1").get();
+            dm2 = new SelfDownloader().execute(context.getFilesDir().getAbsolutePath()
+                    + File.separator + PATH + "1").get();
         } catch (InterruptedException | ExecutionException e) {
             Log.wtf(TAG, "Couldn't get DownloadManager#1", e);
         }
@@ -67,12 +71,13 @@ public class DocumentsManager implements FileManagerInterface<DocumentId, Docume
             INSTANCE.descriptors.remove(document);
         }
         INSTANCE.downloadingFiles = new HashSet<>();
-
+        INSTANCE.context = context;
         new FileRemover().execute(filesToBeRemoved.toArray(new File[filesToBeRemoved.size()]));
         INSTANCE.saveSelf();
+        return INSTANCE;
     }
 
-    DocumentsManager getInstance() {
+    public DocumentsManager getInstance() {
         return INSTANCE;
     }
 
@@ -126,8 +131,14 @@ public class DocumentsManager implements FileManagerInterface<DocumentId, Docume
         });
     }
 
+    private File getFile(String path) {
+        File file = new File(INSTANCE.context.getFilesDir(), path);
+        file.mkdirs();
+        return file;
+    }
+
     private File generateDocumentFile(DocumentId id) {
-        return new File(TextUtils.join(File.separator, Arrays.asList("documents", UUID.randomUUID())));
+        return getFile(TextUtils.join(File.separator, Arrays.asList("documents", UUID.randomUUID())));
     }
 
     private void attachCallback(DocumentId id, ResultListener<LocalFile<DocumentId>> listener) {
@@ -154,7 +165,7 @@ public class DocumentsManager implements FileManagerInterface<DocumentId, Docume
 
         @Override
         protected Void doInBackground(Void... voids) {
-            File file = new File(DocumentsManager.PATH + Integer.toString(INSTANCE.recordedAt));
+            File file = INSTANCE.getFile(DocumentsManager.PATH + Integer.toString(INSTANCE.recordedAt));
             ObjectOutputStream stream = null;
             try {
                 stream = new ObjectOutputStream(new FileOutputStream(file));
