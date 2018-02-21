@@ -50,6 +50,7 @@ import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 import ru.spbau.lecturenotes.storage.identifiers.GroupId;
 import ru.spbau.lecturenotes.storage.requests.AddCommentRequest;
+import ru.spbau.lecturenotes.storage.requests.AddDocumentRequest;
 import ru.spbau.lecturenotes.storage.requests.AttachmentSketch;
 import ru.spbau.lecturenotes.storage.requests.NewAttachmentRequest;
 import ru.spbau.lecturenotes.storage.requests.NewDiscussionRequest;
@@ -406,6 +407,73 @@ public class FirebaseProxy implements DatabaseInterface {
             public void onFailure(@NonNull Exception e) {
                 Log.e(TAG, "Failed to add a new discussionId to Document " + request.getDocumentId().getKey(), e);
                 listener.onError(e);
+            }
+        });
+    }
+
+    @Override
+    public void addDocument(final AddDocumentRequest request, final ResultListener<Document> listener) {
+        final String documentPath = TextUtils.join("/",
+                Arrays.asList("documents",
+                        request.getGroup().getKey(),
+                        FirebaseAuth.getInstance().getUid(),
+                        UUID.randomUUID().toString()));
+        StorageReference storageReference = storage.getReference();
+        final StorageReference documentReference = storageReference.child(documentPath);
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(request.getSketch().getPdf());
+        } catch (FileNotFoundException e) {
+            listener.onError(e);
+            return;
+        }
+        documentReference.putStream(inputStream)
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Could not upload document " + request.getSketch().getPdf().getName()
+                                + " to a storage location: " + documentPath, e);
+                        listener.onError(e);
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.i(TAG, "Successfully uploaded document to the storage");
+                DocumentReference docRef = Schema.documents(db, request.getGroup())
+                        .document();
+                final FirebaseDocument firebaseDocument = new FirebaseDocument();
+                firebaseDocument.updateTimestamp = null;
+                firebaseDocument.id = new DocumentId(
+                        request.getGroup(),
+                        docRef.getId(),
+                        request.getSketch().getFilename());
+                firebaseDocument.reference = new FirebaseDocumentDataReference();
+                firebaseDocument.reference.storageReference = documentPath;
+                firebaseDocument.reference.type = "PDF";
+                docRef.set(firebaseDocument).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Failed to add Document for the path: " + request.getSketch().getPdf().getName(), e);
+                        documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.i(TAG, "Document was successfully deleted from the storage");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG, "Failed to delete Document from the storage", e);
+                            }
+                        });
+                        listener.onError(e);
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.i(TAG, "Loaded Document to the Group: " + request.getGroup().getKey());
+                        getDocument(firebaseDocument.getId(), listener);
+                    }
+                });
             }
         });
     }
