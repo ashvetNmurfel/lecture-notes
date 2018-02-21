@@ -133,6 +133,7 @@ public class DocumentListActivity extends AppCompatActivity {
         }
         if (id == R.id.action_add_document) {
             Intent intent = new Intent(DocumentListActivity.this, AddDocumentActivity.class);
+            intent.putExtra(AddDocumentActivity.INTENT_GROUP_EXTRA, shownGroup);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
