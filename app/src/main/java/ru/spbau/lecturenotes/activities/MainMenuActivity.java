@@ -39,7 +39,7 @@ public class MainMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MainMenuActivity";
 
-    protected ListenerController groupsListener;
+    protected ListenerController groupsListener = null;
 
     // UI elements
     protected ProgressBar spinner;
@@ -91,7 +91,9 @@ public class MainMenuActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         spinner.setVisibility(View.VISIBLE);
-        setGroupListener();
+        if (MainMenuController.getUserInfo() != null) {
+            setGroupListener();
+        }
         super.onStart();
     }
 
