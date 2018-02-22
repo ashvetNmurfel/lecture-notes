@@ -45,11 +45,4 @@ dependencies {
     compile 'com.github.chrisbanes:PhotoView:+'
 }
 
-
-
-
-
-
-
-
 apply plugin: 'com.google.gms.google-services'

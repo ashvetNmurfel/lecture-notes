@@ -1,9 +1,12 @@
 package ru.spbau.lecturenotes.activities;
 
+import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.pdf.PdfRenderer;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -11,6 +14,8 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -18,6 +23,7 @@ import android.widget.ToggleButton;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +38,8 @@ import ru.spbau.lecturenotes.services.MetadataSyncService;
 import ru.spbau.lecturenotes.storage.Comment;
 import ru.spbau.lecturenotes.storage.Discussion;
 import ru.spbau.lecturenotes.storage.DiscussionLocation;
+import ru.spbau.lecturenotes.storage.Document;
+import ru.spbau.lecturenotes.storage.LocalFile;
 import ru.spbau.lecturenotes.storage.Rectangle;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.firebase.FirebaseProxy;
@@ -48,11 +56,7 @@ import ru.spbau.lecturenotes.uiElements.PdfViewer.ShowRectView;
 
 public class PdfActivity extends AppCompatActivity {
     private CommentSyncService commentSyncService = new CommentSyncService(FirebaseProxy.getInstance());
-    private FileSyncService fileSyncService = new FileSyncService(
-            FirebaseProxy.getInstance(),
-            AttachmentManager.initInstance(getApplicationContext()),
-            DocumentsManager.initInstance(getApplicationContext()));
-    private MetadataSyncService metadataSyncService = new MetadataSyncService(FirebaseProxy.getInstance());
+    private FileSyncService fileSyncService;
     private DocumentId documentId;
     private int currentPage = 0;
     private List<DiscussionId> discussionIdList = new ArrayList<>();
@@ -60,28 +64,44 @@ public class PdfActivity extends AppCompatActivity {
     private final List<Comment> commentList = new ArrayList<Comment>();
     private PdfCommentAdapter commentAdapter;
 
-    private ArrayList<Integer> pageImages;
-
-    {
-        pageImages = new ArrayList<>(Arrays.asList(
-                R.drawable.term1_algebra_03,
-                R.drawable.term1_algebra_04,
-                R.drawable.term1_algebra_05,
-                R.drawable.term1_algebra_06,
-                R.drawable.term1_algebra_07,
-                R.drawable.term1_algebra_08,
-                R.drawable.term1_algebra_09,
-                R.drawable.term1_algebra_10,
-                R.drawable.term1_algebra_11,
-                R.drawable.term1_algebra_12));
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf);
+
+        fileSyncService = new FileSyncService(
+                FirebaseProxy.getInstance(),
+                AttachmentManager.initInstance(getApplicationContext()),
+                DocumentsManager.initInstance(getApplicationContext()));
+
         documentId = (DocumentId) getIntent().getExtras().get("documentId");
+
+        commentSyncService.getDocument(documentId, new ResultListener<Document>() {
+            @Override
+            public void onResult(Document result) {
+                Log.i("pdf", "Got Document, setting DocDownld Listener");
+                fileSyncService.onDocumentDownloaded(result, new ResultListener<LocalFile<DocumentId>>() {
+                    @Override
+                    public void onResult(LocalFile<DocumentId> result) {
+                        Log.i("pdf", "onDocumentDownloaded, onResult");
+
+                        ListView pdfPageListView = findViewById(R.id.pdfPictureListView);
+                        PdfPageAdapter pdfPageAdapter = new PdfPageAdapter(getApplicationContext(), result.getFile(), pdfPageListView);
+                        pdfPageListView.setAdapter(pdfPageAdapter);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Throwable error) {
+
+            }
+        });
 
         commentAdapter = new PdfCommentAdapter(PdfActivity.this, commentList);
         commentListView = findViewById(R.id.commentsList);
@@ -99,13 +119,7 @@ public class PdfActivity extends AppCompatActivity {
             }
         });
 
-
-        ArrayList<PdfPage> pageArrayList = new ArrayList<>(Arrays.asList(new PdfPage(), new PdfPage(), new PdfPage()));
-
         final ListView pdfPageListView = findViewById(R.id.pdfPictureListView);
-        PdfPageAdapter pdfPageAdapter = new PdfPageAdapter(this, pageArrayList, pdfPageListView);
-        pdfPageListView.setAdapter(pdfPageAdapter);
-
         pdfPageListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int i) {
@@ -237,6 +251,10 @@ public class PdfActivity extends AppCompatActivity {
 
     public void onClickPlusButtonGoToCommentMode(View view) {
         changeViewerCommentMode();
+        ListView listView = findViewById(R.id.pdfPictureListView);
+        ListAdapter listAdapter = listView.getAdapter();
+        PhotoView photoView = findViewById(R.id.photoView);
+        photoView.setImageBitmap((Bitmap) listAdapter.getItem(currentPage));
     }
 
     @Override

@@ -22,7 +22,7 @@
             android:id="@+id/photoView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/term1_algebra_03"/>
+            android:background="#FFFFFFFF"/>
 
         <ru.spbau.lecturenotes.uiElements.PdfViewer.DragRectView
             android:id="@+id/dragRect"

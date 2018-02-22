@@ -1,59 +1,73 @@
 package ru.spbau.lecturenotes.uiElements.PdfViewer;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.pdf.PdfRenderer;
+import android.os.ParcelFileDescriptor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import ru.spbau.lecturenotes.R;
+import ru.spbau.lecturenotes.storage.LocalFile;
+import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 import ru.spbau.lecturenotes.temp.PdfPage;
 
 public class PdfPageAdapter extends BaseAdapter {
 
     private final Context context;
-    private final ArrayList<PdfPage> pageList;
     private final LayoutInflater layoutInflater;
     private final ListView parent;
+    private final File file;
+    private PdfRenderer pdfRenderer;
+    private final int A4_WIDTH = 900;
+    private final int A4_HEIGHT = A4_WIDTH*297/210;
 
-    private ArrayList<Integer> pageImages;
-    {
-        pageImages = new ArrayList<>(Arrays.asList(
-                R.drawable.term1_algebra_03,
-                R.drawable.term1_algebra_04,
-                R.drawable.term1_algebra_05,
-                R.drawable.term1_algebra_06,
-                R.drawable.term1_algebra_07,
-                R.drawable.term1_algebra_08,
-                R.drawable.term1_algebra_09,
-                R.drawable.term1_algebra_10,
-                R.drawable.term1_algebra_11,
-                R.drawable.term1_algebra_12));
-    }
-
-
-    public PdfPageAdapter(Context context, ArrayList<PdfPage> pageList, ListView parent) {
+    public PdfPageAdapter(Context context, File file, ListView parent) {
         this.context = context;
-        this.pageList = pageList;
+        this.file = file;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.parent = parent;
+
+        try {
+            ParcelFileDescriptor fileDescriptor = ParcelFileDescriptor
+                    .open(file, ParcelFileDescriptor.MODE_READ_ONLY);
+            pdfRenderer = new PdfRenderer(fileDescriptor);
+            Log.i("pdf", "Set bitmap image");
+        } catch (IOException e) {
+            Log.e("pdf", "IOException while reading pdf");
+        }
     }
 
     @Override
     public int getCount() {
-        return pageImages.size();
+        return pdfRenderer == null ? 0 : pdfRenderer.getPageCount();
     }
 
     @Override
     public Object getItem(int i) {
-        return pageList.get(i);
+        if (pdfRenderer != null) {
+            PdfRenderer.Page page = pdfRenderer.openPage(i);
+            Bitmap bitmap = Bitmap.createBitmap(A4_WIDTH, A4_HEIGHT, Bitmap.Config.ARGB_8888);
+            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+            page.close();
+            return bitmap;
+        }
+        return null;
     }
 
     @Override
@@ -67,10 +81,17 @@ public class PdfPageAdapter extends BaseAdapter {
         if (view == null) {
             view = layoutInflater.inflate(R.layout.listview_page_item, viewGroup, false);
         }
-
-        RelativeLayout relativeLayout = (RelativeLayout) view;
-        PhotoView photoView = (PhotoView) relativeLayout.getChildAt(0);
-        photoView.setImageResource(pageImages.get(i));
+        if (pdfRenderer != null) {
+            PdfRenderer.Page page = pdfRenderer.openPage(i);
+            RelativeLayout relativeLayout = (RelativeLayout) view;
+            PhotoView photoView = (PhotoView) relativeLayout.getChildAt(0);
+            Log.i("getView", photoView.getWidth() + " " + photoView.getHeight());
+            Log.i("getView", photoView.getMaxWidth() + " " + photoView.getMaxHeight());
+            Bitmap bitmap = Bitmap.createBitmap(A4_WIDTH, A4_HEIGHT, Bitmap.Config.ARGB_8888);
+            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+            photoView.setImageBitmap(bitmap);
+            page.close();
+        }
         return view;
     }
 }

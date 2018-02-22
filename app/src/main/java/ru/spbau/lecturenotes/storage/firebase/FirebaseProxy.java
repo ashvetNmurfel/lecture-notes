@@ -201,7 +201,7 @@ public class FirebaseProxy implements DatabaseInterface {
                 if (task.isSuccessful()) {
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot != null) {
-                        Log.i(TAG, "Got documentId snapshot for Attachment: " + documentSnapshot.getId());
+                        Log.i(TAG, "Got documentId snapshot for Comment: " + documentSnapshot.getId());
                         listener.onResult(FirebaseObjectsConvertor
                                 .toComment(documentSnapshot.toObject(FirebaseComment.class)));
                     } else {
