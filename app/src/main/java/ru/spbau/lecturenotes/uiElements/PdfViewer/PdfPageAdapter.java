@@ -3,6 +3,8 @@ package ru.spbau.lecturenotes.uiElements.PdfViewer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.pdf.PdfRenderer;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -15,6 +17,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.github.chrisbanes.photoview.OnMatrixChangedListener;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.File;
@@ -80,6 +83,10 @@ public class PdfPageAdapter extends BaseAdapter {
         View view = oldView;
         if (view == null) {
             view = layoutInflater.inflate(R.layout.listview_page_item, viewGroup, false);
+        } else {
+            RelativeLayout relativeLayout = (RelativeLayout) view;
+            ShowRectView rectView = (ShowRectView) relativeLayout.getChildAt(1);
+            rectView.setRect(new Rect());
         }
         if (pdfRenderer != null) {
             PdfRenderer.Page page = pdfRenderer.openPage(i);

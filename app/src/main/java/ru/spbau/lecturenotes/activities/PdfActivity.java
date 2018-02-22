@@ -4,9 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.pdf.PdfRenderer;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -14,7 +12,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -23,18 +20,15 @@ import android.widget.ToggleButton;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import ru.spbau.lecturenotes.R;
 import ru.spbau.lecturenotes.services.AttachmentManager;
 import ru.spbau.lecturenotes.services.CommentSyncService;
 import ru.spbau.lecturenotes.services.DocumentsManager;
-import ru.spbau.lecturenotes.services.FileManagerInterface;
 import ru.spbau.lecturenotes.services.FileSyncService;
-import ru.spbau.lecturenotes.services.MetadataSyncService;
 import ru.spbau.lecturenotes.storage.Comment;
 import ru.spbau.lecturenotes.storage.Discussion;
 import ru.spbau.lecturenotes.storage.DiscussionLocation;
@@ -48,7 +42,6 @@ import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 import ru.spbau.lecturenotes.storage.requests.CommentSketch;
 import ru.spbau.lecturenotes.storage.requests.DiscussionSketch;
-import ru.spbau.lecturenotes.temp.PdfPage;
 import ru.spbau.lecturenotes.uiElements.PdfViewer.DragRectView;
 import ru.spbau.lecturenotes.uiElements.PdfViewer.PdfCommentAdapter;
 import ru.spbau.lecturenotes.uiElements.PdfViewer.PdfPageAdapter;
@@ -61,7 +54,7 @@ public class PdfActivity extends AppCompatActivity {
     private int currentPage = 0;
     private List<DiscussionId> discussionIdList = new ArrayList<>();
     private ListView commentListView;
-    private final List<Comment> commentList = new ArrayList<Comment>();
+    private final List<Comment> commentList = new ArrayList<>();
     private PdfCommentAdapter commentAdapter;
 
     @Override
@@ -140,32 +133,34 @@ public class PdfActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Comment comment = (Comment) adapterView.getAdapter().getItem(i);
                 DiscussionId discussionId = comment.getId().getDiscussionId();
-                Log.i("onItemClick", discussionId.getLocation().getPage() + "");
-                RelativeLayout pageView = (RelativeLayout) pdfPageListView.getChildAt(0);
-
-                PhotoView pagePictureView = (PhotoView) pageView.getChildAt(0);
-                ShowRectView showRectView = (ShowRectView) pageView.getChildAt(1);
-
-                int height = pagePictureView.getDrawable().getIntrinsicHeight();
-                int width = pagePictureView.getDrawable().getIntrinsicWidth();
-
-                Matrix m = new Matrix();
-                pagePictureView.getDisplayMatrix(m);
-                m.preScale(width, height);
-
-                RectF rectF = new RectF(discussionId.getLocation().getRectangle().getRect());
-                m.mapRect(rectF);
-                Rect rect = new Rect();
-                rectF.round(rect);
-
-                Log.i("ShowRect", rect.toShortString());
-
-                showRectView.setRect(rect);
+                currentRect = discussionId.getLocation().getRectangle().getRect();
+                drawRectangle();
             }
         });
 
-
         onPageChange();
+    }
+
+    private void drawRectangle() {
+        ListView pdfPageListView = findViewById(R.id.pdfPictureListView);
+        RelativeLayout pageView = (RelativeLayout) pdfPageListView.getChildAt(0);
+
+        PhotoView pagePictureView = (PhotoView) pageView.getChildAt(0);
+        ShowRectView showRectView = (ShowRectView) pageView.getChildAt(1);
+
+        int height = pagePictureView.getDrawable().getIntrinsicHeight();
+        int width = pagePictureView.getDrawable().getIntrinsicWidth();
+
+        Matrix m = new Matrix();
+        pagePictureView.getDisplayMatrix(m);
+        m.preScale(width, height);
+
+        RectF rectF = new RectF(currentRect);
+        m.mapRect(rectF);
+        Rect rect = new Rect();
+        rectF.round(rect);
+
+        showRectView.setRect(rect);
     }
 
 
@@ -203,6 +198,12 @@ public class PdfActivity extends AppCompatActivity {
                     public void onResult(List<Comment> result) {
                         commentList.clear();
                         commentList.addAll(result);
+                        commentList.sort(new Comparator<Comment>() {
+                            @Override
+                            public int compare(Comment comment, Comment t1) {
+                                return comment.getCreationTimestamp().compareTo(t1.getCreationTimestamp());
+                            }
+                        });
                         commentAdapter.notifyDataSetChanged();
                         findViewById(R.id.commentsList).setVisibility(View.VISIBLE);
                         findViewById(R.id.commentsListProgressBar).setVisibility(View.GONE);
@@ -244,7 +245,21 @@ public class PdfActivity extends AppCompatActivity {
         findViewById(R.id.commentsList).setVisibility(View.GONE);
         findViewById(R.id.commentsListProgressBar).setVisibility(View.VISIBLE);
         setDiscussionListForCurrentPage();
+
+//        ListView pdfPageListView = findViewById(R.id.pdfPictureListView);
+//        RelativeLayout pageView = (RelativeLayout) pdfPageListView.getChildAt(0);
+//        PhotoView pagePictureView = (PhotoView) pageView.getChildAt(0);
+//        if (pagePictureView != null) {
+//            pagePictureView.setOnMatrixChangeListener(new OnMatrixChangedListener() {
+//                @Override
+//                public void onMatrixChanged(RectF rect) {
+//                    drawRectangle();
+//                }
+//            });
+//        }
     }
+
+    private RectF currentRect = new RectF();
 
 
     private boolean isInCommentMode;
