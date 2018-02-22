@@ -37,6 +37,7 @@ import ru.spbau.lecturenotes.storage.DiscussionLocation;
 import ru.spbau.lecturenotes.storage.Rectangle;
 import ru.spbau.lecturenotes.storage.ResultListener;
 import ru.spbau.lecturenotes.storage.firebase.FirebaseProxy;
+import ru.spbau.lecturenotes.storage.identifiers.CommentId;
 import ru.spbau.lecturenotes.storage.identifiers.DiscussionId;
 import ru.spbau.lecturenotes.storage.identifiers.DocumentId;
 import ru.spbau.lecturenotes.storage.requests.CommentSketch;
@@ -52,19 +53,19 @@ public class PdfActivity extends AppCompatActivity {
     private DocumentId documentId;
     private int currentPage = 0;
     private List<DiscussionId> discussionIdList = new ArrayList<>();
-
     private ListView commentListView;
+    private final List<Comment> commentList = new ArrayList<Comment>();
+    private PdfCommentAdapter commentAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf);
-
-        commentListView = findViewById(R.id.commentsList);
-        Log.i("onCreate", commentListView.toString());
-
         documentId = (DocumentId) getIntent().getExtras().get("documentId");
-        setTitle(documentId.getFilename());
+
+        commentAdapter = new PdfCommentAdapter(PdfActivity.this, commentList);
+        commentListView = findViewById(R.id.commentsList);
+        commentListView.setAdapter(commentAdapter);
 
         commentSyncService.listenToDiscussionList(documentId, new ResultListener<List<DiscussionId>>() {
             @Override
@@ -82,7 +83,7 @@ public class PdfActivity extends AppCompatActivity {
         ArrayList<PdfPage> pageArrayList = new ArrayList<>(Arrays.asList(new PdfPage(), new PdfPage(), new PdfPage()));
 
         final ListView pdfPageListView = findViewById(R.id.pdfPictureListView);
-        final PdfPageAdapter pdfPageAdapter = new PdfPageAdapter(this, pageArrayList, pdfPageListView);
+        PdfPageAdapter pdfPageAdapter = new PdfPageAdapter(this, pageArrayList, pdfPageListView);
         pdfPageListView.setAdapter(pdfPageAdapter);
 
         pdfPageListView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -99,9 +100,6 @@ public class PdfActivity extends AppCompatActivity {
                 }
             }
         });
-
-//        pdfPageAdapter.notifyDataSetChanged();
-
 
         commentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -128,6 +126,9 @@ public class PdfActivity extends AppCompatActivity {
                 showRectView.setRect(rect);
             }
         });
+
+
+        onPageChange();
     }
 
 
@@ -140,33 +141,41 @@ public class PdfActivity extends AppCompatActivity {
             }
         }
 
-        PdfCommentAdapter commentAdapter = new PdfCommentAdapter(PdfActivity.this, currentPageDiscussionIdList);
-        Log.i("setDiscussionListForCurrentPage", commentListView.toString());
-        commentListView.setAdapter(commentAdapter);
-
-        for (int k = 0; k < currentPageDiscussionIdList.size(); k++) {
-            final int i = k;
-            final DiscussionId discussionId = discussionIdList.get(i);
-            commentSyncService.listenToCommentList(discussionId, new ResultListener<List<Comment>>() {
-                @Override
-                public void onResult(List<Comment> result) {
-                    if (result.size() == 0) {
-                        Log.e("comments", "A discussion " + discussionId.getKey() + " with 0 comments found, ignoring.");
+        commentSyncService.getDiscussions(discussionIdList, new ResultListener<List<Discussion>>() {
+            @Override
+            public void onResult(List<Discussion> result) {
+                Toast.makeText(getApplicationContext(), "get discussions", Toast.LENGTH_LONG).show();
+                List<CommentId> commentIdList = new ArrayList<>();
+                for (Discussion discussion : result) {
+                    if (discussion.getComments().isEmpty()) {
                         return;
                     }
-                    Comment comment = result.get(0);
-                    Log.i("setDiscussionListForCurrentPage listenToCommentList onResult", commentListView.toString());
-                    LinearLayout linearLayout = (LinearLayout) commentListView.getChildAt(i);
-                    TextView textView = (TextView) linearLayout.getChildAt(0);
-                    textView.setText(comment.getContent().getText());
+                    commentIdList.add(discussion.getComments().get(0));
                 }
+                commentSyncService.getComments(commentIdList, new ResultListener<List<Comment>>() {
+                    @Override
+                    public void onResult(List<Comment> result) {
+                        Toast.makeText(getApplicationContext(), "get comments", Toast.LENGTH_LONG).show();
+                        commentList.clear();
+                        commentList.addAll(result);
+                        commentAdapter.notifyDataSetChanged();
+                    }
 
-                @Override
-                public void onError(Throwable error) {
-                    Log.e("comments", "Error while loading discussion " + discussionId.getKey());
-                }
-            });
-        }
+                    @Override
+                    public void onError(Throwable error) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Throwable error) {
+
+            }
+        });
+
+
+        commentAdapter.notifyDataSetChanged();
     }
 
     private void onPageChange() {

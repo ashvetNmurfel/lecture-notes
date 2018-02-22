@@ -285,6 +285,7 @@ public class FirebaseProxy implements DatabaseInterface {
                 new LoadCollectionListener<>(FirebaseComment.class, listener,new Function<FirebaseComment, Comment>() {
                     @Override
                     public Comment apply(FirebaseComment firebaseComment) {
+                        Log.i(TAG, "Got Comment for Discussion " + discussionId.getKey());
                         return FirebaseObjectsConvertor.toComment(firebaseComment);
                     }
                 }));
@@ -293,23 +294,33 @@ public class FirebaseProxy implements DatabaseInterface {
     @Override
     public void getCommentsList(final List<CommentId> ids, final ResultListener<List<Comment>> listener) {
         Log.i(TAG, "Attempting to get Comments list");
-        new LoadListListener<>(ids, listener, new BiConsumer<CommentId, ResultListener<Comment>>() {
+        if (ids.isEmpty()) {
+            Log.i(TAG, "CommentIds is empty. Nothing to get");
+            return;
+        }
+        getComment(ids.get(0), new LoadListListener<>(ids, listener, new BiConsumer<CommentId, ResultListener<Comment>>() {
             @Override
             public void accept(CommentId commentId, ResultListener<Comment> listener) {
+                Log.i(TAG, "Got Comment " + commentId.getKey());
                 getComment(commentId, listener);
             }
-        });
+        }));
     }
 
     @Override
     public void getDiscussionsList(final List<DiscussionId> ids, final ResultListener<List<Discussion>> listener) {
         Log.i(TAG, "Attempting to get Discussions list");
-        new LoadListListener<>(ids, listener, new BiConsumer<DiscussionId, ResultListener<Discussion>>() {
+        if (ids.isEmpty()) {
+            Log.i(TAG, "DiscussionIds is empty. Nothing to get");
+            return;
+        }
+        getDiscussion(ids.get(0), new LoadListListener<>(ids, listener, new BiConsumer<DiscussionId, ResultListener<Discussion>>() {
             @Override
             public void accept(DiscussionId discussionId, ResultListener<Discussion> listener) {
+                Log.i(TAG, "Got Discussion " + discussionId.getKey());
                 getDiscussion(discussionId, listener);
             }
-        });
+        }));
     }
 
     @Override
@@ -359,6 +370,7 @@ public class FirebaseProxy implements DatabaseInterface {
             new LoadCollectionListener<>(FirebaseComment.class, listener, new Function<FirebaseComment, CommentId>() {
                 @Override
                 public CommentId apply(FirebaseComment firebaseComment) {
+                    Log.i(TAG, "Got Comment " + firebaseComment.getId().getKey() + " from " + discussionId.getKey());
                     return firebaseComment.getId();
                 }
             }));
@@ -373,6 +385,7 @@ public class FirebaseProxy implements DatabaseInterface {
             new LoadCollectionListener<>(FirebaseDiscussion.class, listener, new Function<FirebaseDiscussion, DiscussionId>() {
                 @Override
                 public DiscussionId apply(FirebaseDiscussion firebaseDiscussion) {
+                    Log.i(TAG, "Got Discussion from Document " + documentId.getKey());
                     return firebaseDiscussion.getId();
                 }
             }));
