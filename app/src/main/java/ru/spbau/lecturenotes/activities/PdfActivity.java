@@ -1,10 +1,8 @@
 package ru.spbau.lecturenotes.activities;
 
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,17 +11,12 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.github.chrisbanes.photoview.PhotoView;
-
-import org.vudroid.core.DecodeServiceBase;
-import org.vudroid.pdfdroid.codec.PdfContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +49,23 @@ public class PdfActivity extends AppCompatActivity {
     private ListView commentListView;
     private final List<Comment> commentList = new ArrayList<Comment>();
     private PdfCommentAdapter commentAdapter;
+
+    private ArrayList<Integer> pageImages;
+
+    {
+        pageImages = new ArrayList<>(Arrays.asList(
+                R.drawable.term1_algebra_03,
+                R.drawable.term1_algebra_04,
+                R.drawable.term1_algebra_05,
+                R.drawable.term1_algebra_06,
+                R.drawable.term1_algebra_07,
+                R.drawable.term1_algebra_08,
+                R.drawable.term1_algebra_09,
+                R.drawable.term1_algebra_10,
+                R.drawable.term1_algebra_11,
+                R.drawable.term1_algebra_12));
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +114,11 @@ public class PdfActivity extends AppCompatActivity {
         commentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                DiscussionId discussionId = (DiscussionId) adapterView.getAdapter().getItem(i);
-                RelativeLayout pageView = (RelativeLayout) pdfPageListView.getChildAt(discussionId.getLocation().getPage());
+                Comment comment = (Comment) adapterView.getAdapter().getItem(i);
+                DiscussionId discussionId = comment.getId().getDiscussionId();
+                Log.i("onItemClick", discussionId.getLocation().getPage() + "");
+                RelativeLayout pageView = (RelativeLayout) pdfPageListView.getChildAt(0);
+
                 PhotoView pagePictureView = (PhotoView) pageView.getChildAt(0);
                 ShowRectView showRectView = (ShowRectView) pageView.getChildAt(1);
 
@@ -132,6 +145,15 @@ public class PdfActivity extends AppCompatActivity {
     }
 
 
+    private boolean isShowingRect() {
+        ListView pdfPageListView = findViewById(R.id.pdfPictureListView);
+        RelativeLayout pageView = (RelativeLayout) pdfPageListView.getChildAt(0);
+        if (pageView != null) {
+            ShowRectView showRectView = (ShowRectView) pageView.getChildAt(1);
+            return !showRectView.getRect().isEmpty();
+        }
+        return false;
+    }
 
     private void setDiscussionListForCurrentPage() {
         List<DiscussionId> currentPageDiscussionIdList = new ArrayList<>();
@@ -141,24 +163,25 @@ public class PdfActivity extends AppCompatActivity {
             }
         }
 
-        commentSyncService.getDiscussions(discussionIdList, new ResultListener<List<Discussion>>() {
+        commentSyncService.getDiscussions(currentPageDiscussionIdList, new ResultListener<List<Discussion>>() {
             @Override
             public void onResult(List<Discussion> result) {
-                Toast.makeText(getApplicationContext(), "get discussions", Toast.LENGTH_LONG).show();
                 List<CommentId> commentIdList = new ArrayList<>();
                 for (Discussion discussion : result) {
                     if (discussion.getComments().isEmpty()) {
-                        return;
+                        continue;
                     }
                     commentIdList.add(discussion.getComments().get(0));
                 }
+
                 commentSyncService.getComments(commentIdList, new ResultListener<List<Comment>>() {
                     @Override
                     public void onResult(List<Comment> result) {
-                        Toast.makeText(getApplicationContext(), "get comments", Toast.LENGTH_LONG).show();
                         commentList.clear();
                         commentList.addAll(result);
                         commentAdapter.notifyDataSetChanged();
+                        findViewById(R.id.commentsList).setVisibility(View.VISIBLE);
+                        findViewById(R.id.commentsListProgressBar).setVisibility(View.GONE);
                     }
 
                     @Override
@@ -178,8 +201,24 @@ public class PdfActivity extends AppCompatActivity {
         commentAdapter.notifyDataSetChanged();
     }
 
+    private void dropRect() {
+        ListView pdfPageListView = findViewById(R.id.pdfPictureListView);
+        RelativeLayout pageView = (RelativeLayout) pdfPageListView.getChildAt(0);
+        if (pageView != null) {
+            ShowRectView showRectView = (ShowRectView) pageView.getChildAt(1);
+            showRectView.setRect(new Rect());
+        }
+    }
+
     private void onPageChange() {
         setTitle(documentId.getFilename() + " - " + (currentPage + 1));
+
+        dropRect();
+
+        commentList.clear();
+        commentAdapter.notifyDataSetChanged();
+        findViewById(R.id.commentsList).setVisibility(View.GONE);
+        findViewById(R.id.commentsListProgressBar).setVisibility(View.VISIBLE);
         setDiscussionListForCurrentPage();
     }
 
@@ -194,6 +233,8 @@ public class PdfActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (isInCommentMode) {
             changeViewerCommentMode();
+        } else if (isShowingRect()) {
+            dropRect();
         } else {
             super.onBackPressed();
         }
@@ -201,7 +242,6 @@ public class PdfActivity extends AppCompatActivity {
 
     public void onClickButtonSendComment(View view) {
         EditText editText = findViewById(R.id.editTextComment);
-
         PhotoView photoView = findViewById(R.id.photoView);
         DragRectView dragRect = findViewById(R.id.dragRect);
 

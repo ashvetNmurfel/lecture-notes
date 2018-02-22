@@ -7,7 +7,7 @@
         android:id="@+id/pagePictureItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/term1_algebra_05"
+        android:src="@drawable/term1_algebra_03"
         android:scaleType="centerInside" />
 
     <ru.spbau.lecturenotes.uiElements.PdfViewer.ShowRectView

@@ -45,4 +45,8 @@ public class ShowRectView extends View {
         this.rect = rect;
         invalidate();
     }
+
+    public Rect getRect() {
+        return rect;
+    }
 }
