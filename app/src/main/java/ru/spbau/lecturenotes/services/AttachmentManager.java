@@ -142,7 +142,7 @@ public class AttachmentManager implements FileManagerInterface<AttachmentId, Att
 
     private File getFile(String path) {
         File file = new File(INSTANCE.context.getFilesDir(), path);
-        file.mkdirs();
+        file.getParentFile().mkdirs();
         return file;
     }
 
