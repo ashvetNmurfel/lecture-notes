@@ -22,8 +22,6 @@ import android.widget.ToggleButton;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
-import org.vudroid.core.DecodeServiceBase;
-import org.vudroid.pdfdroid.codec.PdfContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
