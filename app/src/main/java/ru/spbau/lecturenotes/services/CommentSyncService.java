@@ -28,6 +28,10 @@ public class CommentSyncService {
         this.db = db;
     }
 
+    public void getDocument(@NotNull DocumentId document, @NotNull ResultListener<Document> listener) {
+        Log.i(TAG, "Getting document " + document.getKey());
+        db.getDocument(document, listener);
+    }
     public ListenerController listenToDiscussionList(
             final @NotNull DocumentId document,
             final @NotNull ResultListener<List<DiscussionId>> listener) {
