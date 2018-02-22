@@ -40,7 +40,7 @@ public class DocumentsManager implements FileManagerInterface<DocumentId, Docume
     private HashSet<DocumentId> downloadedFiles;
     private HashSet<DocumentId> downloadingFiles;
 
-    static DocumentsManager initInstance(Context context) {
+    public static DocumentsManager initInstance(Context context) {
         DocumentsManager dm1 = null;
         DocumentsManager dm2 = null;
 

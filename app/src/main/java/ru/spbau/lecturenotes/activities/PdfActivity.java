@@ -23,7 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import ru.spbau.lecturenotes.R;
+import ru.spbau.lecturenotes.services.AttachmentManager;
 import ru.spbau.lecturenotes.services.CommentSyncService;
+import ru.spbau.lecturenotes.services.DocumentsManager;
+import ru.spbau.lecturenotes.services.FileManagerInterface;
+import ru.spbau.lecturenotes.services.FileSyncService;
+import ru.spbau.lecturenotes.services.MetadataSyncService;
 import ru.spbau.lecturenotes.storage.Comment;
 import ru.spbau.lecturenotes.storage.Discussion;
 import ru.spbau.lecturenotes.storage.DiscussionLocation;
@@ -43,6 +48,11 @@ import ru.spbau.lecturenotes.uiElements.PdfViewer.ShowRectView;
 
 public class PdfActivity extends AppCompatActivity {
     private CommentSyncService commentSyncService = new CommentSyncService(FirebaseProxy.getInstance());
+    private FileSyncService fileSyncService = new FileSyncService(
+            FirebaseProxy.getInstance(),
+            AttachmentManager.initInstance(getApplicationContext()),
+            DocumentsManager.initInstance(getApplicationContext()));
+    private MetadataSyncService metadataSyncService = new MetadataSyncService(FirebaseProxy.getInstance());
     private DocumentId documentId;
     private int currentPage = 0;
     private List<DiscussionId> discussionIdList = new ArrayList<>();
